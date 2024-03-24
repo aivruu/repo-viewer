@@ -1,0 +1,36 @@
+name: build
+on:
+  push:
+    # Execute this job if the action is a 'push' onto current branch
+    branches:
+      - main
+  pull_request:
+    # Execute this job if the action is a 'pull_request'.
+    branches:
+      - main
+jobs:
+  build:
+    # We want to run this job on latest ubuntu release.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java_version: [ 17 ]
+
+    # Steps to fire on this job.
+    steps:
+      - name: checkout-repo
+        uses: actions/checkout@v3
+
+      - name: java-setup
+        uses: actions/setup-java@v3
+        with:
+          # Use the release set on the matrix.
+          java-version: ${{ matrix.java_version }}
+
+          # Use the Azul-Zulu JDK distribution.
+          distribution: zulu
+
+      - name: compile
+        run: |
+          chmod +x gradlew
+          ./gradlew build
