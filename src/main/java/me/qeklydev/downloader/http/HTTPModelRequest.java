@@ -84,7 +84,7 @@ public record HTTPModelRequest(@NotNull String repository) {
       try {
         final var request = HttpRequest.newBuilder()
             .GET()
-            .uri(new URI(this.repository + "/releases/latest"))
+            .uri(new URI(this.repository))
             .timeout(TIME_OUT)
             .build();
         final var response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
