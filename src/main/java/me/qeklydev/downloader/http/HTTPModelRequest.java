@@ -72,8 +72,9 @@ public record HTTPModelRequest(@NotNull String repository) {
 
   /**
    * Executes a GET type request to the API with a specific
-   * time-out, the response can be a Json text. Or empty if
-   * an exception is triggered during the operation.
+   * time-out, the response can be a Json text. Or {@code null}
+   * if the repository doesn't exist, or an exception was triggered
+   * during the operation.
    *
    * @return The {@link CompletableFuture} with the final
    *     request response.
