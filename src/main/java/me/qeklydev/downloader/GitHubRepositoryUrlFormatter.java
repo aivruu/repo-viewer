@@ -46,7 +46,7 @@ public final class GitHubRepositoryUrlFormatter {
    * @return A URL formatted for HTTPS requests to GitHub API.
    * @since 0.0.1
    */
-  public @NotNull String of(final @NotNull String user, final @NotNull String repository) {
+  public static @NotNull String of(final @NotNull String user, final @NotNull String repository) {
     return GITHUB_API_URL.formatted(user, repository);
   }
 }
