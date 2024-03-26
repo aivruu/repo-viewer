@@ -38,8 +38,7 @@ public final class IoAsyncUtils {
    *
    * @since 0.0.1
    */
-  private static final ExecutorService IO_POOL_THREAD =
-      Executors.newCachedThreadPool(r -> new Thread("release-downloader-io-thread"));
+  private static final ExecutorService IO_POOL_THREAD = Executors.newCachedThreadPool();
 
   private IoAsyncUtils() {
     throw new UnsupportedOperationException("This class is used for utility and cannot be instantiated.");
