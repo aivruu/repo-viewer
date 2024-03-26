@@ -24,6 +24,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import me.qeklydev.downloader.release.ReleaseModel;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,11 +46,27 @@ public enum ReleaseModelDeserializer implements JsonDeserializer<ReleaseModel> {
   public static final Gson GSON = new GsonBuilder()
       .registerTypeAdapter(ReleaseModel.class, INSTANCE)
       .create();
+  /**
+   * Used to concatenate values from the JSON body provided
+   * by HTTP requests.
+   *
+   * @since 0.0.1
+   */
+  public static final StringBuilder BUILDER = new StringBuilder();
 
   @Override
   public @NotNull ReleaseModel deserialize(final @NotNull JsonElement jsonElement, final @NotNull Type type,
                                            final @NotNull JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
     final var providedJsonObject = jsonElement.getAsJsonObject();
-    return new ReleaseModel(providedJsonObject.getAsString());
+    final var providedAssets = providedJsonObject.getAsJsonArray("assets").asList();
+    final var assetsList = new ArrayList<String>(providedAssets.size());
+    for (final var element : providedAssets) {
+      final var assetObject = element.getAsJsonObject();
+      assetsList.add(BUILDER.append(assetObject.get("name").getAsString())
+          .append(": ")
+          .append(assetObject.get("url").getAsString())
+          .toString());
+    }
+    return new ReleaseModel(providedJsonObject.get("tag_name").getAsString(), assetsList);
   }
 }
