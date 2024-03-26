@@ -18,6 +18,7 @@
 package me.qeklydev.downloader.release;
 
 import java.util.Arrays;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,9 +26,11 @@ import org.jetbrains.annotations.NotNull;
  * the requested repository release.
  *
  * @param version the release version.
+ * @param assets the list with the url and name
+ *               of the assets for this release.
  * @since 0.0.1
  */
-public record ReleaseModel(@NotNull String version) {
+public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull String> assets) {
   /**
    * Returns a string array with every value
    * of the version.
