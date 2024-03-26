@@ -38,7 +38,7 @@ public final class GitHubURLProvider {
   }
 
   /**
-   * Returns the {@link GitHubRepositoryUrlFormatter#GITHUB_API_URL} formatted with
+   * Returns the {@link GitHubURLProvider#GITHUB_API_URL} formatted with
    * the values provided to create a usable URL for HTTPS requests.
    *
    * @param user the github user.
