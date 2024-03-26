@@ -33,6 +33,8 @@ spotless {
 dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
     implementation("com.google.code.gson:gson:2.10.1")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
 
 tasks {
