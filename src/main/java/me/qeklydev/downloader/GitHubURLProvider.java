@@ -33,7 +33,7 @@ public final class GitHubURLProvider {
    */
   private static final String GITHUB_API_URL = "https://api.github.com/repos/%s/%s";
 
-  private GitHubRepositoryUrlFormatter() {
+  private GitHubURLProvider() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
 
