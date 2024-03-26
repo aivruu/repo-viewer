@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 0.0.1
  */
-public final class GitHubRepositoryUrlFormatter {
+public final class GitHubURLProvider {
   /**
    * GitHub API URL used for repositories requests.
    *
