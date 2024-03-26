@@ -17,15 +17,16 @@
  */
 package me.qeklydev.downloader.http;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import me.qeklydev.downloader.codec.ReleaseModelDeserializer;
 import me.qeklydev.downloader.release.ReleaseModel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This record is used for each HTTP request triggered
@@ -37,12 +38,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public record HTTPModelRequest(@NotNull String repository) {
   /**
-   * Maximum time for the connection and read HTTP
-   * request time-outs.
+   * The HTTP client used for the requests.
    *
    * @since 0.0.1
    */
-  private static final byte TIME_OUT = (byte) TimeUnit.MILLISECONDS.toSeconds(60);
+  private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
+  /**
+   * The maximum time-out for the HTTP request.
+   *
+   * @since 0.0.1
+   */
+  private static final Duration TIME_OUT = Duration.ofSeconds(60);
 
   /**
    * Executes the request to the API for receive a json
@@ -51,12 +57,17 @@ public record HTTPModelRequest(@NotNull String repository) {
    *
    * @return The {@link CompletableFuture} with a
    *     {@link ReleaseModel} with the latest
-   *     release information.
+   *     release information. Otherwise {@code null}.
    * @since 0.0.1
+   * @see HTTPModelRequest#executeGETRequest()
    */
-  public @NotNull CompletableFuture<@NotNull ReleaseModel> provideLatestRelease() {
-    return this.executeGETRequest().thenApply(json ->
-        ReleaseModelDeserializer.GSON.fromJson(json, ReleaseModel.class));
+  public @NotNull CompletableFuture<@Nullable ReleaseModel> provideLatestRelease() {
+    return this.executeGETRequest().thenApply(json -> {
+      if (json == null) {
+        return null;
+      }
+      return ReleaseModelDeserializer.GSON.fromJson(json, ReleaseModel.class);
+    });
   }
 
   /**
@@ -68,26 +79,25 @@ public record HTTPModelRequest(@NotNull String repository) {
    *     request response.
    * @since 0.0.1
    */
-  public @NotNull CompletableFuture<@NotNull String> executeGETRequest() {
+  public @NotNull CompletableFuture<@Nullable String> executeGETRequest() {
     return CompletableFuture.supplyAsync(() -> {
       try {
-        final var urlContentBuilder = new StringBuilder();
-        final var url = new URL(this.repository + "/releases/latest");
-        final var urlConnection = url.openConnection();
-        final var httpConnection = (HttpURLConnection) urlConnection;
-        httpConnection.setRequestMethod("GET");
-        httpConnection.setReadTimeout(TIME_OUT);
-        httpConnection.setConnectTimeout(TIME_OUT);
-        try (final var requestReader = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()))) {
-          String line;
-          while ((line = requestReader.readLine()) != null) {
-            urlContentBuilder.append(line.trim());
-          }
-        }
-        return urlContentBuilder.toString();
+        final var request = HttpRequest.newBuilder()
+            .GET()
+            .uri(new URI(this.repository + "/releases/latest"))
+            .timeout(TIME_OUT)
+            .build();
+        final var response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        final var responseStatusCode = response.statusCode();
+        /*
+         * We need to check if the requested repository exists,
+         * in this case the HTTP request will respond with a 404
+         * status code.
+         */
+        return (responseStatusCode == 404) ? null : response.body();
       } catch (final Exception exception) {
         exception.printStackTrace();
-        return "";
+        return null;
       }
     });
   }
