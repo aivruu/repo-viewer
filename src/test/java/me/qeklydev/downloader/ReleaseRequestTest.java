@@ -17,25 +17,41 @@
  */
 package me.qeklydev.downloader;
 
-import me.qeklydev.downloader.http.HTTPModelRequest;
+import java.net.http.HttpClient;
+import me.qeklydev.downloader.http.HTTPRepositoryModelRequest;
 import org.junit.jupiter.api.Test;
 
 public class ReleaseRequestTest {
   @Test
   void test() {
-    final var httpModelRequest = new HTTPModelRequest(
-        GitHubRepositoryUrlFormatter.of("FrozzMC", "title")); // Provides a formatted URL for request.
-    final var releaseModel = httpModelRequest.provideLatestRelease().join();
-    if (releaseModel == null) {
-      System.out.println("HTTP request body not received, or the repository don't have any release yet.");
+    final var httpRepositoryRequest = new HTTPRepositoryModelRequest(
+        HttpClient.newHttpClient(), GitHubURLProvider.of("aivruu", "AnnounceMessages"));
+    final var repositoryModel = httpRepositoryRequest.provideModel().join();
+    if (repositoryModel == null) {
+      System.out.println("Repository doesn't exists, or HTTP request has failed.");
       return;
     }
-    System.out.println("HTTP request response received.");
-    System.out.println("version: " + releaseModel.version());
-    final var releaseAssets = releaseModel.assets();
-    System.out.println("assets:");
-    for (final var element : releaseAssets) {
-      System.out.println("- " + element);
-    }
+    final var license = repositoryModel.license();
+    System.out.println("Information about aivruu/AnnounceMessages repository:");
+    System.out.println("Owner: " + repositoryModel.owner());
+    System.out.println("Name: " + repositoryModel.name());
+    System.out.println("Description: " + repositoryModel.description());
+    System.out.println("License: {");
+    System.out.println(" Key: " + license.name());
+    System.out.println(" Name: " + license.fullName());
+    System.out.println(" Url: " + license.url());
+    System.out.println("}");
+    /*
+     * The release model can be null, but this repository does
+     * have a release published, so we can skip the null check.
+     */
+    System.out.println("Latest release: " + repositoryModel.releaseModel().version());
+    System.out.println("Forked: " + repositoryModel.isForked());
+    System.out.println("Accept Forks: " + repositoryModel.canBeForked());
+    System.out.println("Stars: " + repositoryModel.stars());
+    System.out.println("Forks: " + repositoryModel.forks());
+    System.out.println("Public: " + repositoryModel.isPublic());
+    System.out.println("Archived: " + repositoryModel.isArchived());
+    System.out.println("Most-Used Language: " + repositoryModel.language());
   }
 }
