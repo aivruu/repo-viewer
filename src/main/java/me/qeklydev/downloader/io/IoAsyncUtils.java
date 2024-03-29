@@ -54,7 +54,7 @@ public final class IoAsyncUtils {
    *     status provided for this operation.
    * @since 0.0.1
    */
-  public static @NotNull CompletableFuture<@NotNull Boolean> fromURL(final @NotNull String fileName, final @NotNull URL requestedUrl) {
+  public static @NotNull CompletableFuture<@NotNull Boolean> downloadOf(final @NotNull String fileName, final @NotNull URL requestedUrl) {
     return CompletableFuture.supplyAsync(() -> {
       try (final var inputStream = new BufferedInputStream(requestedUrl.openStream());
            final var outputStream = new FileOutputStream(fileName)) {
