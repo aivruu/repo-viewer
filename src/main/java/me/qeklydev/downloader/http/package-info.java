@@ -1,6 +1,6 @@
 /**
- * Provides model for repository release requests
- * handling.
+ * Provides model and implementations for repository and releases
+ * HTTP requests handling.
  *
  * @since 0.0.1
  */
