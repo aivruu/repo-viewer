@@ -17,8 +17,6 @@
  */
 package me.qeklydev.downloader.codec;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -27,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import me.qeklydev.downloader.release.ReleaseModel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Json deserializer implementation for handle provided
@@ -34,18 +33,9 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 0.0.1
  */
-public enum ReleaseModelDeserializer implements JsonDeserializer<ReleaseModel> {
+public enum ReleaseModelCodec implements JsonDeserializer<ReleaseModel> {
   INSTANCE;
 
-  /**
-   * Gson instance that uses this custom adapter for
-   * perform deserialization to upcoming json data files.
-   *
-   * @since 0.0.1
-   */
-  public static final Gson GSON = new GsonBuilder()
-      .registerTypeAdapter(ReleaseModel.class, INSTANCE)
-      .create();
   /**
    * Used to concatenate values from the JSON body provided
    * by HTTP requests.
@@ -55,9 +45,13 @@ public enum ReleaseModelDeserializer implements JsonDeserializer<ReleaseModel> {
   public static final StringBuilder BUILDER = new StringBuilder();
 
   @Override
-  public @NotNull ReleaseModel deserialize(final @NotNull JsonElement jsonElement, final @NotNull Type type,
-                                           final @NotNull JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+  public @Nullable ReleaseModel deserialize(final @NotNull JsonElement jsonElement, final @NotNull Type type,
+                                            final @NotNull JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
     final var providedJsonObject = jsonElement.getAsJsonObject();
+    final var possibleMessage = providedJsonObject.get("message");
+    if (possibleMessage != null) { // Checks if the latest repository exists.
+      return null;
+    }
     final var providedAssets = providedJsonObject.getAsJsonArray("assets").asList();
     final var assetsList = new ArrayList<String>(providedAssets.size());
     for (final var element : providedAssets) {
