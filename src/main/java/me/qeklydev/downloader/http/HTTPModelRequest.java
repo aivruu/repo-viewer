@@ -17,58 +17,38 @@
  */
 package me.qeklydev.downloader.http;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import me.qeklydev.downloader.codec.ReleaseModelDeserializer;
-import me.qeklydev.downloader.release.ReleaseModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This record is used for each HTTP request triggered
- * to the repository URL given, and provides handling
- * about the latest release for this repository.
+ * This interface is used for handle HTTP requests triggered
+ * using the GitHub API, and provides half-complete information
+ * about these repositories/releases.
  *
- * @param repository the repository url.
+ * @param <M> The model that will be returned after the
  * @since 0.0.1
  */
-public record HTTPModelRequest(@NotNull String repository) {
-  /**
-   * The HTTP client used for the requests.
-   *
-   * @since 0.0.1
-   */
-  private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
+public interface HTTPModelRequest<M> {
   /**
    * The maximum time-out for the HTTP request.
    *
    * @since 0.0.1
    */
-  private static final Duration TIME_OUT = Duration.ofSeconds(60);
+  Duration TIME_OUT = Duration.ofSeconds(60);
 
   /**
    * Executes the request to the API for receive a json
-   * file with the release information, this file is deserialized
+   * body with the repository information, this data is deserialized
    * and is returned with the completable-future.
    *
-   * @return The {@link CompletableFuture} with a
-   *     {@link ReleaseModel} with the latest
-   *     release information. Otherwise {@code null}.
+   * @return The {@link CompletableFuture} with the
+   *     model specified. Otherwise {@code null}.
    * @since 0.0.1
    * @see HTTPModelRequest#executeGETRequest()
    */
-  public @NotNull CompletableFuture<@Nullable ReleaseModel> provideLatestRelease() {
-    return this.executeGETRequest().thenApply(json -> {
-      if (json == null) {
-        return null;
-      }
-      return ReleaseModelDeserializer.GSON.fromJson(json, ReleaseModel.class);
-    });
-  }
+  @NotNull CompletableFuture<@Nullable M> provideModel();
 
   /**
    * Executes a GET type request to the API with a specific
@@ -77,29 +57,9 @@ public record HTTPModelRequest(@NotNull String repository) {
    * during the operation.
    *
    * @return The {@link CompletableFuture} with the final
-   *     request response.
+   *     request response. {@code null} if response status code
+   *     is {@code 404}, or an exception was triggered.
    * @since 0.0.1
    */
-  public @NotNull CompletableFuture<@Nullable String> executeGETRequest() {
-    return CompletableFuture.supplyAsync(() -> {
-      try {
-        final var request = HttpRequest.newBuilder()
-            .GET()
-            .uri(new URI(this.repository))
-            .timeout(TIME_OUT)
-            .build();
-        final var response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        final var responseStatusCode = response.statusCode();
-        /*
-         * We need to check if the requested repository exists,
-         * in this case the HTTP request will respond with a 404
-         * status code.
-         */
-        return (responseStatusCode == 404) ? null : response.body();
-      } catch (final Exception exception) {
-        exception.printStackTrace();
-        return null;
-      }
-    });
-  }
+  @NotNull CompletableFuture<@Nullable String> executeGETRequest();
 }
