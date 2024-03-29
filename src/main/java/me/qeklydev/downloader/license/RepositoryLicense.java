@@ -1,3 +1,20 @@
+/*
+ * This file is part of release-downloader - https://github.com/aivruu/release-downloader
+ * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package me.qeklydev.downloader.license;
 
 import org.jetbrains.annotations.NotNull;
@@ -18,11 +35,11 @@ public enum RepositoryLicense {
   ECLIPSE("Eclipse Public License 2.0", "https://www.eclipse.org/legal/epl-2.0/"),
   CC("Creative Commons Zero v1.0 Universal", "https://creativecommons.org/publicdomain/zero/1.0/");
 
-  private final String licenseName;
+  private final String fullName;
   private final String url;
 
-  RepositoryLicense(final @NotNull String licenseName, final @NotNull String url) {
-    this.licenseName = licenseName;
+  RepositoryLicense(final @NotNull String fullName, final @NotNull String url) {
+    this.fullName = fullName;
     this.url = url;
   }
 
@@ -32,8 +49,8 @@ public enum RepositoryLicense {
    * @return the license name.
    * @since 0.0.1
    */
-  public @NotNull String licenseName() {
-    return this.licenseName;
+  public @NotNull String fullName() {
+    return this.fullName;
   }
 
   /**
