@@ -26,7 +26,7 @@ public class ReleaseRequestTest {
   void test() {
     final var httpRepositoryRequest = new HTTPRepositoryModelRequest(
         HttpClient.newHttpClient(), GitHubURLProvider.of("aivruu", "AnnounceMessages"));
-    final var repositoryModel = httpRepositoryRequest.provideModel().join();
+    final var repositoryModel = httpRepositoryRequest.provideModel();
     if (repositoryModel == null) {
       System.out.println("Repository doesn't exists, or HTTP request has failed.");
       return;
@@ -45,7 +45,7 @@ public class ReleaseRequestTest {
      * The release model can be null, but this repository does
      * have a release published, so we can skip the null check.
      */
-    System.out.println("Latest release: " + repositoryModel.releaseModel().version());
+    System.out.println("Latest release: v" + repositoryModel.releaseModel().version());
     System.out.println("Forked: " + repositoryModel.isForked());
     System.out.println("Accept Forks: " + repositoryModel.canBeForked());
     System.out.println("Stars: " + repositoryModel.stars());
