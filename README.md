@@ -1,10 +1,15 @@
 # release-downloader
 
+[![](https://jitpack.io/v/aivruu/release-downloader.svg)](https://jitpack.io/#aivruu/release-downloader)
+
 `release-downloader` is a library that provides utilities to obtain GitHub repositories information since HTTP requests, and allow download assets of the releases for the requested repositories of an easily way.
 
 > [!NOTE]\
 > This is a library that I created to testing HTTP utilities with Java. At a principle I based me on the [OcZi/release-watcher](https://github.com/OcZi/release-watcher) (with several internal changes) as
 > main idea for this project, later I decided to implement a downloader function type **(BETA)**.
+
+### Documentation
+- [Javadoc](https://javadoc.jitpack.io/com/github/aivruu/release-downloader/0.0.1/javadoc/)
 
 ### Features
 * Obtain and view the repositories information easily with requests to the GitHub API.
