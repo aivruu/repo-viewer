@@ -17,12 +17,11 @@
  */
 package me.qeklydev.downloader.repository;
 
+import java.util.List;
 import me.qeklydev.downloader.license.RepositoryLicense;
 import me.qeklydev.downloader.release.ReleaseModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * This record represents a GitHub repository model based-on
@@ -36,6 +35,8 @@ import java.util.List;
  *                     repository release, {@code null}
  *                     if there's not any release.
  * @param isForked if the repository is a fork.
+ * @param parent the original owner of this repository
+ *               if the repository is not a fork, is {@code null}.
  * @param canBeForked if the repository can be forked.
  * @param stars the amount of stars the repository has.
  * @param forks the amount of forks the repository has.
@@ -51,6 +52,6 @@ import java.util.List;
  */
 public record GitHubRepositoryModel(
     @NotNull String owner, @NotNull String name, @NotNull String description, @NotNull RepositoryLicense license,
-    @Nullable ReleaseModel releaseModel, boolean isForked, boolean canBeForked, int stars, int forks, boolean isPublic,
+    @Nullable ReleaseModel releaseModel, boolean isForked, @Nullable String parent, boolean canBeForked, int stars, int forks, boolean isPublic,
     boolean isArchived, boolean isDisabled, @Nullable String language, @Nullable List<@NotNull String> topics) {
 }
