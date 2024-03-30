@@ -12,6 +12,10 @@
 
 ### Download
 ```kotlin
+repositories {
+  maven("https://jitpack.io/")
+}
+
 dependencies {
   implementation("com.github.aivruu:release-downloader:0.0.1")
 }
@@ -26,6 +30,13 @@ tasks {
 ```
 
 ```xml
+<repositories>
+  <repository>
+    <id>jitpack-repo</id>
+    <url>https://jitpack.io/</url>
+  </repository>
+</repositories>
+
 <dependency>
   <groupId>com.github.aivruu</groupId>
   <artifactId>release-downloader</artifactId>
