@@ -1,1 +1,1 @@
-rootProject.name = "ProJumpPads"
+rootProject.name = "release-downloader"
