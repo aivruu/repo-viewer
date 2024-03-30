@@ -25,7 +25,6 @@ import java.lang.reflect.Type;
 import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.Locale;
-
 import me.qeklydev.downloader.GitHubURLProvider;
 import me.qeklydev.downloader.http.HTTPReleaseModelRequest;
 import me.qeklydev.downloader.license.RepositoryLicense;
@@ -41,8 +40,8 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
   public @NotNull GitHubRepositoryModel deserialize(final @NotNull JsonElement jsonElement, final @NotNull Type type,
                                                     final @NotNull JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
     final var jsonObject = jsonElement.getAsJsonObject();
-    final var owner = jsonObject.get("owner").getAsJsonObject().get("login").getAsString();
-    final var name = jsonObject.get("name").getAsString();
+    final var repositoryOwner = jsonObject.get("owner").getAsJsonObject().get("login").getAsString();
+    final var repositoryName = jsonObject.get("name").getAsString();
     final var description = jsonObject.get("description").getAsString();
     final var licenseKey = jsonObject.get("license").getAsJsonObject().get("key").getAsString();
     /*
@@ -50,7 +49,7 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
      * with "gpl-3.0", if it is true, we will cut the string between
      * from the third character. Other-wise just use the provided key.
      */
-    final var licenseType = RepositoryLicense.valueOf(licenseKey.startsWith("gpl-3.0")
+    final var licenseType = RepositoryLicense.valueOf(licenseKey.equals("gpl-3.0")
         ? licenseKey.substring(0, 3).toUpperCase(Locale.ROOT)
         : licenseKey.toUpperCase(Locale.ROOT));
     /*
@@ -58,11 +57,18 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
      * if the value is null, the latest release doesn't exist.
      * Other-wise just use the given model.
      */
-    final var latestReleaseModel = this.provideReleaseModelRequest(GitHubURLProvider.of(owner, name));
+    final var latestReleaseModel = this.provideReleaseModelRequest(GitHubURLProvider.of(repositoryOwner, repositoryName));
     final var canBeForked = jsonObject.get("allow_forking").getAsBoolean();
     final var starsAmount = jsonObject.get("stargazers_count").getAsInt();
     final var forksAmount = jsonObject.get("forks_count").getAsInt();
-    final var forked = jsonObject.get("fork").getAsBoolean();
+    final var isForked = jsonObject.get("fork").getAsBoolean();
+    /*
+     * If this repository is a fork, we need to get the name
+     * of the owner of the original repository.
+     */
+    final var repositoryParent = isForked
+        ? jsonObject.get("parent").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString()
+        : null;
     final var isPrivate = jsonObject.get("private").getAsBoolean();
     final var isArchived = jsonObject.get("archived").getAsBoolean();
     final var isDisabled = jsonObject.get("disabled").getAsBoolean();
@@ -77,8 +83,8 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
      * information by the HTTP response.
      */
     return new GitHubRepositoryModel(
-        owner, name, description, licenseType, latestReleaseModel,
-        forked, canBeForked, starsAmount, forksAmount,
+        repositoryOwner, repositoryName, description, licenseType, latestReleaseModel,
+        isForked, repositoryParent, canBeForked, starsAmount, forksAmount,
         !isPrivate, isArchived, isDisabled, mostUsedLanguage, topicsList);
   }
 
@@ -90,13 +96,14 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
    * @param repository the repository url.
    * @return The {@link ReleaseModel}, or {@code null}.
    * @since 0.0.1
+   * @see HTTPReleaseModelRequest#provideModel()
    */
   private @Nullable ReleaseModel provideReleaseModelRequest(final @NotNull String repository) {
     final var httpReleaseModelRequest = new HTTPReleaseModelRequest(HttpClient.newHttpClient(), repository);
     /*
-     * Wait until future is completed and return the response
+     * Wait until request is completed and return the response
      * for that operation.
      */
-    return httpReleaseModelRequest.provideModel().join();
+    return httpReleaseModelRequest.provideModel();
   }
 }
