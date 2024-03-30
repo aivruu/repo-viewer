@@ -17,8 +17,12 @@
  */
 package me.qeklydev.downloader.release;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+
+import me.qeklydev.downloader.io.IoAsyncUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,6 +35,40 @@ import org.jetbrains.annotations.NotNull;
  * @since 0.0.1
  */
 public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull String> assets) {
+  /**
+   * Starts the requested asset download using the URL requested
+   * since the assets list based-on the given position value. An
+   * {@code IllegalArgumentException} could be triggered if requested
+   * position is a negative value, or is higher than the assets list size.
+   *
+   * @param position the position of the file URL to download
+   *                 of the assets list.
+   * @return A boolean value depending on operation result,
+   *     {@code true} if operation was successful. Otherwise
+   *     {@code false} if there was not bytes read, or the url
+   *     isn't valid.
+   * @since 0.0.1
+   */
+  public boolean downloadAsset(final int position) {
+    if ((position < 0) || (position > this.assets.size())) {
+      throw new IllegalArgumentException("Requested URL position cannot be negative, or be greater than the release assets amount!");
+    }
+    final var providerParts = this.assets.get(position).split(":", 2);
+    final URL url;
+    try {
+      url = new URL(providerParts[1].trim());
+    } catch (final MalformedURLException exception) {
+      exception.printStackTrace();
+      return false;
+    }
+    final var bytesAmountReadDuringOperation = IoAsyncUtils.downloadOf(providerParts[0].substring(0, providerParts[0].length() - 1), url).join();
+    /*
+     * Wait until operation is completed and request the final status.
+     * then check if the operation was successful or not.
+     */
+    return bytesAmountReadDuringOperation > 0;
+  }
+
   /**
    * Returns a string array with every value
    * of the version.
