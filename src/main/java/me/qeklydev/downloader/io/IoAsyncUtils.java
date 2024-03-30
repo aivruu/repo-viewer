@@ -17,10 +17,10 @@
  */
 package me.qeklydev.downloader.io;
 
-import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.Channels;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,27 +48,28 @@ public final class IoAsyncUtils {
    * Uses the URL object provided to download the content
    * of that URL and be written into a specified file.
    *
-   * @param fileName the file for the bytes writing.
+   * @param fileName the name of the file to be written.
    * @param requestedUrl the url for processing.
    * @return The {@link CompletableFuture} with a boolean
    *     status provided for this operation.
+   *     <p></p>
+   *
+   *     - {@code byte-amount} will provide the amount of bytes
+   *     read for this operation.
+   *     <p></p>
+   *
+   *     - {@code 0} if there wasn't any byte read or an exception
+   *     was triggered.
    * @since 0.0.1
    */
-  public static @NotNull CompletableFuture<@NotNull Boolean> downloadOf(final @NotNull String fileName, final @NotNull URL requestedUrl) {
+  public static @NotNull CompletableFuture<@NotNull Long> downloadOf(final @NotNull String fileName, final @NotNull URL requestedUrl) {
     return CompletableFuture.supplyAsync(() -> {
-      try (final var inputStream = new BufferedInputStream(requestedUrl.openStream());
-           final var outputStream = new FileOutputStream(fileName)) {
-        final var bytesDataBuffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(bytesDataBuffer, 0, 1024)) != -1) {
-          outputStream.write(bytesDataBuffer, 0, bytesRead);
-        }
-        inputStream.close();
-        outputStream.close();
-        return true;
+      try (final var readableByteChannel = Channels.newChannel(requestedUrl.openStream());
+           final var fileOutputStream = new FileOutputStream(fileName)) {
+        return fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
       } catch (final IOException exception) {
         exception.printStackTrace();
-        return false;
+        return 0L;
       }
     }, IO_POOL_THREAD);
   }
