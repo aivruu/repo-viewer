@@ -17,22 +17,25 @@
  */
 package me.qeklydev.downloader.http;
 
-import me.qeklydev.downloader.codec.DeserializationUtils;
-import me.qeklydev.downloader.repository.GitHubRepositoryModel;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
+import me.qeklydev.downloader.codec.DeserializationUtils;
+import me.qeklydev.downloader.repository.GitHubRepositoryModel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public record HTTPRepositoryModelRequest(@NotNull HttpClient httpClient, @NotNull String repository) implements HTTPModelRequest<GitHubRepositoryModel> {
   @Override
-  public @NotNull CompletableFuture<@Nullable GitHubRepositoryModel> provideModel() {
-    return this.executeGETRequest().thenApply(json ->
-        (json == null) ? null : DeserializationUtils.withRepositoryCodec(json));
+  public @Nullable GitHubRepositoryModel provideModel() {
+    final var jsonResponseOrNull = this.executeGETRequest().join();
+    /*
+     * Wait until request have been completed, then request
+     * the response of the HTTP request.
+     */
+    return (jsonResponseOrNull == null) ? null : DeserializationUtils.withRepositoryCodec(jsonResponseOrNull);
   }
 
   @Override
@@ -42,6 +45,7 @@ public record HTTPRepositoryModelRequest(@NotNull HttpClient httpClient, @NotNul
         final var request = HttpRequest.newBuilder()
             .GET()
             .uri(new URI(this.repository))
+            .version(HttpClient.Version.HTTP_1_1)
             .timeout(TIME_OUT)
             .build();
         final var response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());

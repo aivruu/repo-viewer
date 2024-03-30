@@ -29,9 +29,13 @@ import org.jetbrains.annotations.Nullable;
 
 public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull String repository) implements HTTPModelRequest<ReleaseModel> {
   @Override
-  public @NotNull CompletableFuture<@Nullable ReleaseModel> provideModel() {
-    return this.executeGETRequest().thenApply(json ->
-        (json == null) ? null : DeserializationUtils.withReleaseCodec(json));
+  public @Nullable ReleaseModel provideModel() {
+    final var jsonResponseOrNull = this.executeGETRequest().join();
+    /*
+     * Wait until request have been completed, then request
+     * the response of the HTTP request.
+     */
+    return (jsonResponseOrNull == null) ? null : DeserializationUtils.withReleaseCodec(jsonResponseOrNull);
   }
 
   @Override
@@ -41,17 +45,16 @@ public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull S
         final var request = HttpRequest.newBuilder()
             .GET()
             .uri(new URI(this.repository + "/releases/latest"))
+            .version(HttpClient.Version.HTTP_1_1)
             .timeout(TIME_OUT)
             .build();
         final var response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        final var responseStatusCode = response.statusCode();
         /*
-         * We need to check if the requested repository exists
-         * to could request latest release information.
-         * In this case the HTTP request must respond with a 404
-         * status code.
+         * The repository request to the API is performed early, this request
+         * only is performed if the requested repository exists, so we can skip
+         * the check for non-found repositories.
          */
-        return (responseStatusCode == 404) ? null : response.body();
+        return response.body();
       } catch (final Exception exception) {
         exception.printStackTrace();
         return null;
