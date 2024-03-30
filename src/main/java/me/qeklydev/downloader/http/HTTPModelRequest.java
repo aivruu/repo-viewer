@@ -43,12 +43,13 @@ public interface HTTPModelRequest<M> {
    * body with the repository information, this data is deserialized
    * and is returned with the completable-future.
    *
-   * @return The {@link CompletableFuture} with the
-   *     model specified. Otherwise {@code null}.
+   * @return The model specified for this request.
+   *     Otherwise {@code null} if json body requested
+   *     is null.
    * @since 0.0.1
    * @see HTTPModelRequest#executeGETRequest()
    */
-  @NotNull CompletableFuture<@Nullable M> provideModel();
+  @Nullable M provideModel();
 
   /**
    * Executes a GET type request to the API with a specific
