@@ -45,9 +45,9 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
     final var description = jsonObject.get("description").getAsString();
     final var licenseKey = jsonObject.get("license").getAsJsonObject().get("key").getAsString();
     /*
-     * Verifies if the license key for this repository starts
-     * with "gpl-3.0", if it is true, we will cut the string between
-     * from the third character. Other-wise just use the provided key.
+     * Verifies if the license key for this repository is "gpl-3.0", 
+     * if it is true, we will cut the string between from the third 
+     * character. Other-wise just use the provided key.
      */
     final var licenseType = RepositoryLicense.valueOf(licenseKey.equals("gpl-3.0")
         ? licenseKey.substring(0, 3).toUpperCase(Locale.ROOT)
