@@ -8,7 +8,7 @@
 > This is a library that I created to testing HTTP utilities with Java. I taken as base [OcZi/release-watcher](https://github.com/OcZi/release-watcher) for the main idea of this project, later I decided to implement a downloader function type **(BETA)**.
 
 ### Documentation
-- [Javadoc](https://javadoc.jitpack.io/com/github/aivruu/release-downloader/0.0.1/javadoc/)
+- [Javadoc](https://jitpack.io/com/github/aivruu/release-downloader/latest/javadoc/)
 
 ### Features
 * Obtain and view the repositories information easily with requests to the GitHub API.
