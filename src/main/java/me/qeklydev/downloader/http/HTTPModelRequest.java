@@ -18,8 +18,6 @@
 package me.qeklydev.downloader.http;
 
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -57,10 +55,10 @@ public interface HTTPModelRequest<M> {
    * if the repository doesn't exist, or an exception was triggered
    * during the operation.
    *
-   * @return The {@link CompletableFuture} with the final
-   *     request response. {@code null} if response status code
+   * @return The {@link String} that is the body response for
+   *     this request. {@code null} if response status code
    *     is {@code 404}, or an exception was triggered.
    * @since 0.0.1
    */
-  @NotNull CompletableFuture<@Nullable String> executeGETRequest();
+  @Nullable String executeGETRequest();
 }
