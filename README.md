@@ -21,7 +21,8 @@ repositories {
 }
 
 dependencies {
-  implementation("com.github.aivruu:release-downloader:0.0.1")
+  // You can visualize the latest version on the document header.
+  implementation("com.github.aivruu:release-downloader:VERSION")
 }
 
 tasks {
