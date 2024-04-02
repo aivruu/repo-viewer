@@ -21,7 +21,7 @@ import java.net.http.HttpClient;
 import me.qeklydev.downloader.http.HTTPRepositoryModelRequest;
 import org.junit.jupiter.api.Test;
 
-public class ReleaseRequestTest {
+public class RepositoryRequestTest {
   @Test
   void test() {
     final var httpRepositoryRequest = new HTTPRepositoryModelRequest(
