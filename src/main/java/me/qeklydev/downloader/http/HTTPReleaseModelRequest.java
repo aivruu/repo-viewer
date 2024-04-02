@@ -21,7 +21,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.concurrent.CompletableFuture;
 import me.qeklydev.downloader.codec.DeserializationUtils;
 import me.qeklydev.downloader.release.ReleaseModel;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull String repository) implements HTTPModelRequest<ReleaseModel> {
   @Override
   public @Nullable ReleaseModel provideModel() {
-    final var jsonResponseOrNull = this.executeGETRequest().join();
+    final var jsonResponseOrNull = this.executeGETRequest();
     /*
      * Wait until request have been completed, then request
      * the response of the HTTP request.
@@ -39,26 +38,25 @@ public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull S
   }
 
   @Override
-  public @NotNull CompletableFuture<@Nullable String> executeGETRequest() {
-    return CompletableFuture.supplyAsync(() -> {
-      try {
-        final var request = HttpRequest.newBuilder()
-            .GET()
-            .uri(new URI(this.repository + "/releases/latest"))
-            .version(HttpClient.Version.HTTP_1_1)
-            .timeout(TIME_OUT)
-            .build();
-        final var response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        /*
-         * The repository request to the API is performed early, this request
-         * only is performed if the requested repository exists, so we can skip
-         * the check for non-found repositories.
-         */
-        return response.body();
-      } catch (final Exception exception) {
-        exception.printStackTrace();
-        return null;
-      }
-    });
+  public @Nullable String executeGETRequest() {
+    try {
+      final var request = HttpRequest.newBuilder()
+          .GET()
+          .uri(new URI(this.repository + "/releases/latest"))
+          .version(HttpClient.Version.HTTP_1_1)
+          .timeout(TIME_OUT)
+          .build();
+      final var asyncResponse = this.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+      /*
+       * The repository request to the API is performed early, this request
+       * only is performed if the requested repository exists, so we can skip
+       * the check for non-found repositories, then return the JSON body once
+       * the future is complete.
+       */
+      return asyncResponse.thenApply(HttpResponse::body).get();
+    } catch (final Exception exception) {
+      exception.printStackTrace();
+      return null;
+    }
   }
 }
