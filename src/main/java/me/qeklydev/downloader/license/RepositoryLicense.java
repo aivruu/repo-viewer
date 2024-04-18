@@ -26,13 +26,53 @@ import org.jetbrains.annotations.NotNull;
  * @since 0.0.1
  */
 public enum RepositoryLicense {
+  /**
+   * Represents the GPL 3.0 license type.
+   *
+   * @since 0.0.1
+   */
   GPL("GNU General Public License v3.0","https://www.gnu.org/licenses/gpl-3.0.html"),
+  /**
+   * Represents the MIT license type.
+   *
+   * @since 0.0.1
+   */
   MIT("MIT License", "https://opensource.org/licenses/MIT"),
+  /**
+   * Represents the Apache 2.0 license type.
+   *
+   * @since 0.0.1
+   */
   APACHE("Apache License 2.0", "https://www.apache.org/licenses/LICENSE-2.0"),
+  /**
+   * Represents the Mozilla Public 2.0 license type.
+   *
+   * @since 0.0.1
+   */
   MOZILLA("Mozilla Public License 2.0", "https://www.mozilla.org/en-US/MPL/2.0/"),
+  /**
+   * Represents the BSD license type.
+   *
+   * @since 0.0.1
+   */
   BSD("BSD 3-Clause License", "https://opensource.org/licenses/BSD-3-Clause"),
+  /**
+   * Indicates that non-license have been specified.
+   *
+   * @since 0.0.1
+   */
   UNLICENSE("The Unlicense", "https://unlicense.org/"),
+  /**
+   * Represents the Eclipse Public 2.0 license type.
+   *
+   * @since 0.0.1
+   */
   ECLIPSE("Eclipse Public License 2.0", "https://www.eclipse.org/legal/epl-2.0/"),
+  /**
+   * Represents the Creative C-Z 1.0 license type.
+   *
+   * @since 0.0.1
+   */
   CC("Creative Commons Zero v1.0 Universal", "https://creativecommons.org/publicdomain/zero/1.0/");
 
   private final String fullName;
