@@ -17,12 +17,10 @@
  */
 package me.qeklydev.downloader.release;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-
 import me.qeklydev.downloader.io.IoAsyncUtils;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -50,22 +48,19 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
    * @since 0.0.1
    */
   public boolean downloadAsset(final int position) {
-    if ((position < 0) || (position > this.assets.size())) {
+    if ((position < 0) || position > this.assets.size()) {
       throw new IllegalArgumentException("Requested URL position cannot be negative, or be greater than the release assets amount!");
     }
-    final var providerParts = this.assets.get(position).split(":", 2);
-    final URL url;
-    try {
-      url = new URL(providerParts[1].trim());
-    } catch (final MalformedURLException exception) {
-      exception.printStackTrace();
-      return false;
-    }
-    final var bytesAmountReadDuringOperation = IoAsyncUtils.downloadOf(providerParts[0].substring(0, providerParts[0].length() - 1), url).join();
+    final var provider = this.assets.get(position).split(":", 2);
+    final var requestedUrl = provider[1].trim(); // We remove additional spaces for avoid exception throws.
     /*
      * Wait until operation is completed and request the final status.
      * then check if the operation was successful or not.
      */
+    final var bytesAmountReadDuringOperation = IoAsyncUtils.downloadOf(
+        provider[0].substring(0, provider[0].length() - 1),
+        requestedUrl
+    ).join();
     return bytesAmountReadDuringOperation > 0;
   }
 
@@ -76,7 +71,8 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
    * @return The semantic string version.
    * @since 0.0.1
    */
-  public @NotNull String[] semanticVersion() {
+  @Contract(pure = true)
+  public @NotNull String @NotNull [] semanticVersion() {
     // e.g 2.10.1 -> ["2", "10", "1"]
     return this.version.split("\\.");
   }
@@ -103,7 +99,7 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
       }
       integersArray[integersArray.length - 1] = numericValue;
     }
-    return (integersArray.length > 1) && (integersArray[integersArray.length - 1]) == 0
+    return ((integersArray.length > 1) && integersArray[integersArray.length - 1] == 0)
         ? nonZeroIntegersArray : integersArray;
   }
 
