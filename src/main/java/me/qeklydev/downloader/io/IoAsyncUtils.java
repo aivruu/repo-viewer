@@ -19,11 +19,13 @@ package me.qeklydev.downloader.io;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import me.qeklydev.downloader.logger.LoggerUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,6 +34,13 @@ import org.jetbrains.annotations.NotNull;
  * @since 0.0.1
  */
 public final class IoAsyncUtils {
+  /**
+   * Represents the value that will be returned if operation
+   * has suffered a mishap.
+   *
+   * @since 0.1.2
+   */
+  private static final long SINGLE_RETURN_VALUE = 0L;
   /**
    * A cached-thread-pool used to perform I/O writing or
    * reading operations.
@@ -53,23 +62,35 @@ public final class IoAsyncUtils {
    * @return The {@link CompletableFuture} with a boolean
    *     status provided for this operation.
    *     <p></p>
-   *
    *     - {@code byte-amount} will provide the amount of bytes
    *     read for this operation.
    *     <p></p>
-   *
-   *     - {@code 0} if there wasn't any byte read or an exception
+   *     - {@link IoAsyncUtils#SINGLE_RETURN_VALUE} if there wasn't any byte read or an exception
    *     was triggered.
    * @since 0.0.1
+   * @see IoAsyncUtils#SINGLE_RETURN_VALUE
    */
-  public static @NotNull CompletableFuture<@NotNull Long> downloadOf(final @NotNull String fileName, final @NotNull URL requestedUrl) {
+  public static @NotNull CompletableFuture<@NotNull Long> downloadOf(final @NotNull String fileName,
+                                                                     final @NotNull String requestedUrl) {
     return CompletableFuture.supplyAsync(() -> {
-      try (final var readableByteChannel = Channels.newChannel(requestedUrl.openStream());
+      URL url;
+      /*
+       * We try to create a new URL object
+       * and try to catch an exception if
+       * provided url isn't valid.
+       */
+      try {
+        url = new URL(requestedUrl);
+      } catch (final MalformedURLException exception) {
+        LoggerUtils.error("URL provided for asset-download is not valid.");
+        return SINGLE_RETURN_VALUE;
+      }
+      try (final var readableByteChannel = Channels.newChannel(url.openStream());
            final var fileOutputStream = new FileOutputStream(fileName)) {
         return fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
       } catch (final IOException exception) {
         exception.printStackTrace();
-        return 0L;
+        return SINGLE_RETURN_VALUE;
       }
     }, IO_POOL_THREAD);
   }
