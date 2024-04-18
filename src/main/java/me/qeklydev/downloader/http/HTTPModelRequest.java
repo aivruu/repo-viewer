@@ -25,10 +25,10 @@ import org.jetbrains.annotations.Nullable;
  * using the GitHub API, and provides half-complete information
  * about these repositories/releases.
  *
- * @param <M> The model that will be returned after the
+ * @param <T> The model that will be returned after the
  * @since 0.0.1
  */
-public interface HTTPModelRequest<M> {
+public interface HTTPModelRequest<T> {
   /**
    * The maximum time-out for the HTTP request.
    *
@@ -47,7 +47,7 @@ public interface HTTPModelRequest<M> {
    * @since 0.0.1
    * @see HTTPModelRequest#executeGETRequest()
    */
-  @Nullable M provideModel();
+  @Nullable T provideModel();
 
   /**
    * Executes a GET type request to the API with a specific
