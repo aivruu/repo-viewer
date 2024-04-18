@@ -22,10 +22,20 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.qeklydev.downloader.codec.DeserializationUtils;
+import me.qeklydev.downloader.logger.LoggerUtils;
 import me.qeklydev.downloader.repository.GitHubRepositoryModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * This record class is used to proportionate handling
+ * about the requests for repositories information.
+ *
+ * @param httpClient the {@link HttpClient} for the
+ *                   request.
+ * @param repository the requested repository.
+ * @since 0.0.1
+ */
 public record HTTPRepositoryModelRequest(@NotNull HttpClient httpClient, @NotNull String repository) implements HTTPModelRequest<GitHubRepositoryModel> {
   @Override
   public @Nullable GitHubRepositoryModel provideModel() {
@@ -43,8 +53,6 @@ public record HTTPRepositoryModelRequest(@NotNull HttpClient httpClient, @NotNul
       final var request = HttpRequest.newBuilder()
           .GET()
           .uri(new URI(this.repository))
-          .version(HttpClient.Version.HTTP_1_1)
-          .timeout(TIME_OUT)
           .build();
       final var asyncResponse = this.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
       /*
@@ -62,7 +70,7 @@ public record HTTPRepositoryModelRequest(@NotNull HttpClient httpClient, @NotNul
         return (responseStatusCode == 404) ? null : providedRequestResponse.body();
       }).get();
     } catch (final Exception exception) {
-      exception.printStackTrace();
+      LoggerUtils.error("Http request for repository could not be completed.");
       return null;
     }
   }

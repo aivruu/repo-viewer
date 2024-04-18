@@ -22,10 +22,20 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.qeklydev.downloader.codec.DeserializationUtils;
+import me.qeklydev.downloader.logger.LoggerUtils;
 import me.qeklydev.downloader.release.ReleaseModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * This record class is used to proportionate handling
+ * about the requests for repositories latest release.
+ *
+ * @param httpClient the {@link HttpClient} for the
+ *                   request.
+ * @param repository the requested repository.
+ * @since 0.0.1
+ */
 public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull String repository) implements HTTPModelRequest<ReleaseModel> {
   @Override
   public @Nullable ReleaseModel provideModel() {
@@ -43,8 +53,6 @@ public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull S
       final var request = HttpRequest.newBuilder()
           .GET()
           .uri(new URI(this.repository + "/releases/latest"))
-          .version(HttpClient.Version.HTTP_1_1)
-          .timeout(TIME_OUT)
           .build();
       final var asyncResponse = this.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
       /*
@@ -55,7 +63,7 @@ public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull S
        */
       return asyncResponse.thenApply(HttpResponse::body).get();
     } catch (final Exception exception) {
-      exception.printStackTrace();
+      LoggerUtils.error("Http request for repository latest release could not be completed.");
       return null;
     }
   }
