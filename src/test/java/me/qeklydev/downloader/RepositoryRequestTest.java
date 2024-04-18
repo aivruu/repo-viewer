@@ -18,14 +18,19 @@
 package me.qeklydev.downloader;
 
 import java.net.http.HttpClient;
+import java.time.Duration;
 import me.qeklydev.downloader.http.HTTPRepositoryModelRequest;
 import org.junit.jupiter.api.Test;
 
 public class RepositoryRequestTest {
   @Test
   void test() {
+    final var httpClient = HttpClient.newBuilder()
+        .version(HttpClient.Version.HTTP_1_1)
+        .connectTimeout(Duration.ofSeconds(60))
+        .build();
     final var httpRepositoryRequest = new HTTPRepositoryModelRequest(
-        HttpClient.newHttpClient(), GitHubURLProvider.of("aivruu", "AnnounceMessages"));
+        httpClient, GitHubURLProvider.of("aivruu", "AnnounceMessages"));
     final var repositoryModel = httpRepositoryRequest.provideModel();
     if (repositoryModel == null) {
       System.out.println("Repository doesn't exists, or HTTP request has failed.");
