@@ -21,7 +21,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import me.qeklydev.downloader.codec.DeserializationUtils;
+import me.qeklydev.downloader.codec.DeserializationProvider;
 import me.qeklydev.downloader.logger.LoggerUtils;
 import me.qeklydev.downloader.release.ReleaseModel;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,10 @@ public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull S
      * Wait until request have been completed, then request
      * the response of the HTTP request.
      */
-    return (jsonResponseOrNull == null) ? null : DeserializationUtils.withReleaseCodec(jsonResponseOrNull);
+    return (jsonResponseOrNull == null) ? null : (ReleaseModel) DeserializationProvider.builder()
+        .jsonBody(jsonResponseOrNull)
+        .codecType(DeserializationProvider.CodecType.RELEASE)
+        .build();
   }
 
   @Override
