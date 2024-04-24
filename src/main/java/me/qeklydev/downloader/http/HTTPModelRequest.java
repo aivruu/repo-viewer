@@ -17,7 +17,6 @@
  */
 package me.qeklydev.downloader.http;
 
-import java.time.Duration;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -29,13 +28,6 @@ import org.jetbrains.annotations.Nullable;
  * @since 0.0.1
  */
 public interface HTTPModelRequest<T> {
-  /**
-   * The maximum time-out for the HTTP request.
-   *
-   * @since 0.0.1
-   */
-  Duration TIME_OUT = Duration.ofSeconds(60);
-
   /**
    * Executes the request to the API for receive a json
    * body with the repository information, this data is deserialized
