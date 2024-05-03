@@ -17,9 +17,9 @@
  */
 package me.qeklydev.downloader.release;
 
-import java.util.Arrays;
 import java.util.List;
 import me.qeklydev.downloader.io.IoAsyncUtils;
+import me.qeklydev.downloader.logger.LoggerUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,8 +48,13 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
    * @since 0.0.1
    */
   public boolean downloadAsset(final int position) {
+    /*
+     * Check if the position given is negative, or the value
+     * is higher than the size of the list.
+     */
     if ((position < 0) || position > this.assets.size()) {
-      throw new IllegalArgumentException("Requested URL position cannot be negative, or be greater than the release assets amount!");
+      LoggerUtils.error("Requested URL position cannot be negative, or be greater than the release assets amount!");
+      return false;
     }
     final var provider = this.assets.get(position).split(":", 2);
     final var requestedUrl = provider[1].trim(); // We remove additional spaces for avoid exception throws.
@@ -78,32 +83,6 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
   }
 
   /**
-   * Returns an int array with every value
-   * of the version.
-   *
-   * @return The semantic integer version.
-   * @since 0.0.1
-   */
-  public int[] semanticIntegerVersion() {
-    var integersArray = new int[0];
-    var nonZeroIntegersArray = new int[0];
-    for (int i = 0; i < this.version.length(); i++) {
-      final var symbol = this.version.charAt(i);
-      if (!Character.isDigit(symbol)) {
-        continue;
-      }
-      integersArray = Arrays.copyOf(integersArray, integersArray.length + 1);
-      final var numericValue = Character.getNumericValue(symbol);
-      if (numericValue != 0) {
-        nonZeroIntegersArray = integersArray;
-      }
-      integersArray[integersArray.length - 1] = numericValue;
-    }
-    return ((integersArray.length > 1) && integersArray[integersArray.length - 1] == 0)
-        ? nonZeroIntegersArray : integersArray;
-  }
-
-  /**
    * Compares the given values to determinate if the semantic
    * version is equal.
    *
@@ -121,7 +100,7 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
          * This value is similar on the current iterated
          * semantic version element.
          */
-        continue;
+        break;
       }
       // Any value is similar so return false.
       return false;

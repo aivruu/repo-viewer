@@ -31,7 +31,13 @@ public enum RepositoryLicense {
    *
    * @since 0.0.1
    */
-  GPL("GNU General Public License v3.0","https://www.gnu.org/licenses/gpl-3.0.html"),
+  GPL_3_0("GNU General Public License v3.0","https://www.gnu.org/licenses/gpl-3.0.html"),
+  /**
+   * Represents the GPL 2.0 license type.
+   * 
+   * @since 0.2.3
+   */
+  GPL_2_0("GNU General Public License v2.0", "https://www.gnu.org/licenses/gpl-2.0.html"),
   /**
    * Represents the MIT license type.
    *
@@ -55,7 +61,13 @@ public enum RepositoryLicense {
    *
    * @since 0.0.1
    */
-  BSD("BSD 3-Clause License", "https://opensource.org/licenses/BSD-3-Clause"),
+  BSD_3("BSD 3-Clause License", "https://opensource.org/licenses/BSD-3-Clause"),
+  /**
+   * Represents the BSD 2-Clause Simplified License type.
+   * 
+   * @since 0.2.3
+   */
+  BSD_2("BSD 2-Clause Simplified License", "https://opensource.org/licenses/BSD-2-Clause"),
   /**
    * Indicates that non-license have been specified.
    *
@@ -73,7 +85,25 @@ public enum RepositoryLicense {
    *
    * @since 0.0.1
    */
-  CC("Creative Commons Zero v1.0 Universal", "https://creativecommons.org/publicdomain/zero/1.0/");
+  CC("Creative Commons Zero v1.0 Universal", "https://creativecommons.org/publicdomain/zero/1.0/"),
+  /**
+   * Represents the Boost Software License 1.0 license type.
+   * 
+   * @since 0.2.3
+   */
+  BOOST_SOFTWARE("Boost Software License 1.0", "https://www.boost.org/LICENSE_1_0.txt"),
+  /**
+   * Represents the GNU Lesser General Public License v3.0 license type.
+   * 
+   * @since 0.2.3
+   */
+  LESSER_GPL("GNU Lesser General Public License v3.0", "https://www.gnu.org/licenses/lgpl-3.0.html"),
+  /**
+   * Represents the GNU Affero General Public License v3.0 license type.
+   * 
+   * @since 0.2.3
+   */
+  AFFERO_GPL("GNU Affero General Public License v3.0", "https://www.gnu.org/licenses/agpl-3.0.html");
 
   private final String fullName;
   private final String url;
