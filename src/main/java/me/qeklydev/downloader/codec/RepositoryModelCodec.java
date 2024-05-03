@@ -46,11 +46,13 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
     final var licenseKey = jsonObject.get("license").getAsJsonObject().get("key").getAsString();
     /*
      * Verifies if the license key for this repository is "gpl-3.0", 
-     * if it is true, we will cut the string between from the third 
-     * character. Other-wise just use the provided key.
+     * if it is true, we will replace the character '-' and '.' by a
+     * '_' character and make it uppercase to be parsed into a valid enum.
      */
     final var licenseType = RepositoryLicense.valueOf(licenseKey.equals("gpl-3.0")
-        ? licenseKey.substring(0, 3).toUpperCase(Locale.ROOT)
+        ? licenseKey.replace("-", "_")
+          .replace(".", "_")
+          .toUpperCase(Locale.ROOT)
         : licenseKey.toUpperCase(Locale.ROOT));
     /*
      * We need to request the release model for this repository,
