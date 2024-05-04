@@ -1,20 +1,16 @@
 plugins {
     `java-library`
     `maven-publish`
-    alias(libs.plugins.indra)
     alias(libs.plugins.spotless)
     alias(libs.plugins.shadow)
 }
 
-repositories {
-    mavenCentral()
+java {
+  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
-indra {
-    javaVersions {
-        target(17)
-        minimumToolchain(17)
-    }
+repositories {
+    mavenCentral()
 }
 
 spotless {
