@@ -1,6 +1,6 @@
 /*
  * This file is part of release-downloader - https://github.com/aivruu/release-downloader
- * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ * Copyright (C) 2020-2024 aivruu (https://github.com/aivruu)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,12 +30,12 @@ import org.jetbrains.annotations.Nullable;
 public interface HTTPModelRequest<T> {
   /**
    * Executes the request to the API for receive a json
-   * body with the repository information, this data is deserialized
-   * and is returned with the completable-future.
+   * body with the repository, or release information, this
+   * data will be serialized using the specific codec type,
+   * and will return the built needed model.
    *
-   * @return The model specified for this request.
-   *     Otherwise {@code null} if json body requested
-   *     is null.
+   * @return The model needed for this request type.
+   *     Otherwise {@code null}.
    * @since 0.0.1
    * @see HTTPModelRequest#executeGETRequest()
    */
@@ -47,9 +47,8 @@ public interface HTTPModelRequest<T> {
    * if the repository doesn't exist, or an exception was triggered
    * during the operation.
    *
-   * @return The {@link String} that is the body response for
-   *     this request. {@code null} if response status code
-   *     is {@code 404}, or an exception was triggered.
+   * @return A possible {@code null} {@link String} that is the JSON-body
+   *     response for this request.
    * @since 0.0.1
    */
   @Nullable String executeGETRequest();
