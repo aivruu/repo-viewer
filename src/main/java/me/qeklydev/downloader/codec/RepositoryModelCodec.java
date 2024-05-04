@@ -1,6 +1,6 @@
 /*
  * This file is part of release-downloader - https://github.com/aivruu/release-downloader
- * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ * Copyright (C) 2020-2024 aivruu (https://github.com/aivruu)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import java.util.Locale;
 import me.qeklydev.downloader.GitHubURLProvider;
 import me.qeklydev.downloader.http.HTTPReleaseModelRequest;
 import me.qeklydev.downloader.license.RepositoryLicense;
+import me.qeklydev.downloader.logger.LoggerUtils;
 import me.qeklydev.downloader.release.ReleaseModel;
 import me.qeklydev.downloader.repository.GitHubRepositoryModel;
 import org.jetbrains.annotations.NotNull;
@@ -44,30 +45,30 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
     final var repositoryName = jsonObject.get("name").getAsString();
     final var description = jsonObject.get("description").getAsString();
     final var licenseKey = jsonObject.get("license").getAsJsonObject().get("key").getAsString();
-    /*
-     * Verifies if the license key for this repository is "gpl-3.0", 
-     * if it is true, we will replace the character '-' and '.' by a
-     * '_' character and make it uppercase to be parsed into a valid enum.
-     */
-    final var licenseType = RepositoryLicense.valueOf(licenseKey.equals("gpl-3.0")
-        ? licenseKey.replace("-", "_")
+    // Verifies if the license key for this repository is "gpl-3.0",
+    // if it is true, we will replace the character '-' and '.' by a
+    // '_' character and make it uppercase to be parsed into a valid enum.
+    var licenseType = RepositoryLicense.UNLICENSE; // Default license type for parsing.
+    try {
+      // We use a try/catch due to possible failed parsing for licenses
+      // keys from GitHub-API, and the already defined on the licenses enum.
+      licenseType = RepositoryLicense.valueOf(licenseKey.equals("gpl-3.0")
+          ? licenseKey.replace("-", "_")
           .replace(".", "_")
           .toUpperCase(Locale.ROOT)
-        : licenseKey.toUpperCase(Locale.ROOT));
-    /*
-     * We need to request the release model for this repository,
-     * if the value is null, the latest release doesn't exist.
-     * Other-wise just use the given model.
-     */
-    final var latestReleaseModel = this.provideReleaseModelRequest(GitHubURLProvider.of(repositoryOwner, repositoryName));
+          : licenseKey.toUpperCase(Locale.ROOT));
+    } catch (final IllegalArgumentException exception) {
+      // Yeah, something went wrong.
+      LoggerUtils.error("Failed to parse license type since GitHub-API request.");
+      // So, license for this repository have not been provided.
+      licenseType = null;
+    }
     final var canBeForked = jsonObject.get("allow_forking").getAsBoolean();
     final var starsAmount = jsonObject.get("stargazers_count").getAsInt();
     final var forksAmount = jsonObject.get("forks_count").getAsInt();
     final var isForked = jsonObject.get("fork").getAsBoolean();
-    /*
-     * If this repository is a fork, we need to get the name
-     * of the owner of the original repository.
-     */
+    // If this repository is a fork of another repository, we need to
+    // get the name of the owner of the original repository.
     final var repositoryParent = isForked
         ? jsonObject.get("parent").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString()
         : null;
@@ -80,10 +81,13 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
     for (final var topicElement : providedTopicsArray) {
       topicsList.add(topicElement.getAsString());
     }
-    /*
-     * Provide a new model reference using the provided
-     * information by the HTTP response.
-     */
+    // We need to request the release model for this repository,
+    // if the value is null, the latest release doesn't exist.
+    // Other-wise just use the given model.
+    final var latestReleaseModel = this.provideReleaseModel(GitHubURLProvider.of(repositoryOwner, repositoryName));
+    // After obtain all required information from JSON-body provided,
+    // we create a new object that represents this requested repository
+    // with all needed information.
     return new GitHubRepositoryModel(
         repositoryOwner, repositoryName, description, licenseType, latestReleaseModel,
         isForked, repositoryParent, canBeForked, starsAmount, forksAmount,
@@ -100,12 +104,8 @@ public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryMod
    * @since 0.0.1
    * @see HTTPReleaseModelRequest#provideModel()
    */
-  private @Nullable ReleaseModel provideReleaseModelRequest(final @NotNull String repository) {
+  private @Nullable ReleaseModel provideReleaseModel(final @NotNull String repository) {
     final var httpReleaseModelRequest = new HTTPReleaseModelRequest(HttpClient.newHttpClient(), repository);
-    /*
-     * Wait until request is completed and return the response
-     * for that operation.
-     */
     return httpReleaseModelRequest.provideModel();
   }
 }
