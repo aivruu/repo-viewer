@@ -1,6 +1,6 @@
 /*
  * This file is part of release-downloader - https://github.com/aivruu/release-downloader
- * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ * Copyright (C) 2020-2024 aivruu (https://github.com/aivruu)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,8 @@ import org.jetbrains.annotations.Nullable;
  * @param owner the owner of the repository.
  * @param name the name of the repository.
  * @param description the description of the repository.
- * @param license the license type of the repository.
+ * @param license the license type of the repository,
+ *                {@code null} if any license was provided.
  * @param releaseModel the abstract model for the latest
  *                     repository release, {@code null}
  *                     if there's not any release.
@@ -51,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
  * @since 0.0.1
  */
 public record GitHubRepositoryModel(
-    @NotNull String owner, @NotNull String name, @NotNull String description, @NotNull RepositoryLicense license,
+    @NotNull String owner, @NotNull String name, @NotNull String description, @Nullable RepositoryLicense license,
     @Nullable ReleaseModel releaseModel, boolean isForked, @Nullable String parent, boolean canBeForked, int stars, int forks, boolean isPublic,
     boolean isArchived, boolean isDisabled, @Nullable String language, @Nullable List<@NotNull String> topics) {
 }
