@@ -1,6 +1,6 @@
 /*
  * This file is part of release-downloader - https://github.com/aivruu/release-downloader
- * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ * Copyright (C) 2020-2024 aivruu (https://github.com/aivruu)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,20 +48,21 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
    * @since 0.0.1
    */
   public boolean downloadAsset(final int position) {
-    /*
-     * Check if the position given is negative, or the value
-     * is higher than the size of the list.
-     */
-    if ((position < 0) || position > this.assets.size()) {
-      LoggerUtils.error("Requested URL position cannot be negative, or be greater than the release assets amount!");
+    final var assetsLength = this.assets.size();
+    // Check if the position given is negative, or the value
+    // is higher than the size of the list.
+    if ((position < 0) || position > assetsLength) {
+      LoggerUtils.error("Requested URL position cannot be negative, or be greater than the release assets amount -> {position} ; {assetsLength}");
       return false;
     }
     final var provider = this.assets.get(position).split(":", 2);
-    final var requestedUrl = provider[1].trim(); // We remove additional spaces for avoid exception throws.
-    /*
-     * Wait until operation is completed and request the final status.
-     * then check if the operation was successful or not.
-     */
+    // We remove additional spaces for avoid exception throws.
+    final var requestedUrl = provider[1].trim();
+    // We wait until completable-future has ended, and we obtain
+    // the final result for that operation, and then we check if
+    // this operation was successful verifying if read-bytes amount
+    // is higher than zero, if it is true, the operation was success and
+    // the asset was downloaded correctly, otherwise the operation failed.
     final var bytesAmountReadDuringOperation = IoAsyncUtils.downloadOf(
         provider[0].substring(0, provider[0].length() - 1),
         requestedUrl
@@ -96,10 +97,8 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
     final var version = this.semanticVersion();
     for (int i = 0; i < parts.length; i++) {
       if (parts[i].equals(version[i])) {
-        /*
-         * This value is similar on the current iterated
-         * semantic version element.
-         */
+        // This value is similar on the current iterated
+        // semantic version element.
         break;
       }
       // Any value is similar so return false.
