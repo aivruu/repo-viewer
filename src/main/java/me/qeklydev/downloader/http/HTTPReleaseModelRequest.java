@@ -1,6 +1,6 @@
 /*
  * This file is part of release-downloader - https://github.com/aivruu/release-downloader
- * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ * Copyright (C) 2020-2024 aivruu (https://github.com/aivruu)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * This record class is used to proportionate handling
- * about the requests for repositories latest release.
+ * about the latest requests of any GitHub repository.
  *
  * @param httpClient the {@link HttpClient} for the
  *                   request.
@@ -39,13 +39,12 @@ import org.jetbrains.annotations.Nullable;
 public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull String repository) implements HTTPModelRequest<ReleaseModel> {
   @Override
   public @Nullable ReleaseModel provideModel() {
-    final var jsonResponseOrNull = this.executeGETRequest();
-    /*
-     * Wait until request have been completed, then request
-     * the response of the HTTP request.
-     */
-    return (jsonResponseOrNull == null) ? null : (ReleaseModel) DeserializationProvider.builder()
-        .jsonBody(jsonResponseOrNull)
+    final var bodyOrNull = this.executeGETRequest();
+    // Once the request have been completed and future has ended,
+    // we obtain the response that will be a JSON-body, or null in
+    // case that an exception was triggered.
+    return (bodyOrNull == null) ? null : (ReleaseModel) DeserializationProvider.builder()
+        .jsonBody(bodyOrNull)
         .codecType(DeserializationProvider.CodecType.RELEASE)
         .build();
   }
@@ -55,15 +54,13 @@ public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull S
     try {
       final var request = HttpRequest.newBuilder()
           .GET()
-          .uri(new URI(this.repository + "/releases/latest"))
+          .uri(new URI("{repository}/releases/latest" /* Java-21 Feature! :D */))
           .build();
       final var asyncResponse = this.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-      /*
-       * The repository request to the API is performed early, this request
-       * only is performed if the requested repository exists, so we can skip
-       * the check for non-found repositories, then return the JSON body once
-       * the future is complete.
-       */
+      // The repository request to the API is performed before this request
+      // execution, this request only will be executed if the requested repository
+      // exists, so, we can skip the non-found repositories check, and return the single
+      // JSON-body once the completable-future has ended for this request.
       return asyncResponse.thenApply(HttpResponse::body).get();
     } catch (final Exception exception) {
       LoggerUtils.error("Http request for repository latest release could not be completed.");
