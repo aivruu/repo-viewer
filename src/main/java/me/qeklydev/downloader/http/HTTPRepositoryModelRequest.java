@@ -1,6 +1,6 @@
 /*
  * This file is part of release-downloader - https://github.com/aivruu/release-downloader
- * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ * Copyright (C) 2020-2024 aivruu (https://github.com/aivruu)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,13 +39,13 @@ import org.jetbrains.annotations.Nullable;
 public record HTTPRepositoryModelRequest(@NotNull HttpClient httpClient, @NotNull String repository) implements HTTPModelRequest<GitHubRepositoryModel> {
   @Override
   public @Nullable GitHubRepositoryModel provideModel() {
-    final var jsonResponseOrNull = this.executeGETRequest();
-    /*
-     * Wait until request have been completed, then request
-     * the response of the HTTP request.
-     */
-    return (jsonResponseOrNull == null) ? null : (GitHubRepositoryModel) DeserializationProvider.builder()
-        .jsonBody(jsonResponseOrNull)
+    final var bodyOrNull = this.executeGETRequest();
+    // Once the request have been completed and future has ended,
+    // we obtain the response that will be a JSON-body, or null in
+    // case that request has failed due to any reason (404 status code,
+    // or exception trigger).
+    return (bodyOrNull == null) ? null : (GitHubRepositoryModel) DeserializationProvider.builder()
+        .jsonBody(bodyOrNull)
         .codecType(DeserializationProvider.CodecType.REPOSITORY)
         .build();
   }
@@ -58,19 +58,17 @@ public record HTTPRepositoryModelRequest(@NotNull HttpClient httpClient, @NotNul
           .uri(new URI(this.repository))
           .build();
       final var asyncResponse = this.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-      /*
-       * Wait until async request is completed and a response is returned,
-       * we check if status code is 404, at that case return null, otherwise
-       * return the json body for the request.
-       */
+      // Once the request has been completed, we obtain the response from
+      // the API, then we check if the returned status code is 404 (non-existing
+      // repository).
       return asyncResponse.thenApply(providedRequestResponse -> {
         final var responseStatusCode = providedRequestResponse.statusCode();
-        /*
-         * We need to check if the requested repository exists,
-         * in this case the HTTP request will respond with a 404
-         * status code.
-         */
+        // We need to check if the requested repository exists,
+        // in this case the request will respond with a 404
+        // status code, in another case we can return the JSON-body.
         return (responseStatusCode == 404) ? null : providedRequestResponse.body();
+        // After this operation have been completed, we return the final result for
+        // this future.
       }).get();
     } catch (final Exception exception) {
       LoggerUtils.error("Http request for repository could not be completed.");
