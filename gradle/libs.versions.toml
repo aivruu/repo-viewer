@@ -1,8 +1,6 @@
 [versions]
-blossom = "2.1.0"
 shadow = "8.1.1"
 spotless = "6.25.0"
-indra = "3.0.1"
 
 # Version declaration for GSON.
 gson = "2.10.1"
@@ -13,5 +11,3 @@ gson = { group = "com.google.code", name = "gson", version.ref = "gson" }
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-indra = { id = "net.kyori.indra", version.ref = "indra" }
-indra-checkstyle = { id = "net.kyori.indra.checkstyle", version.ref = "indra" }
