@@ -1,6 +1,6 @@
 /*
  * This file is part of release-downloader - https://github.com/aivruu/release-downloader
- * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ * Copyright (C) 2020-2024 aivruu (https://github.com/aivruu)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,15 +98,13 @@ public final class DeserializationProvider {
      * @since 0.2.2
      */
     public <T> @NotNull T build() {
-      /*
-       * Check if json-body or codec-type have been specified
-       * on builder.
-       */
+      // Check if json-body or codec-type have been specified
+      // on builder.
       if (this.jsonBody == null || this.codecType == null) {
         throw new IllegalStateException("Json body or codec type for the deserialization have not been specified!");
       }
       return switch (this.codecType) {
-        case RELEASE, REPOSITORY -> GSON_PROVIDER.fromJson(jsonBody, codecType.typeClass());
+        case RELEASE, REPOSITORY -> GSON_PROVIDER.fromJson(this.jsonBody, this.codecType.typeClass());
       };
     }
   }
