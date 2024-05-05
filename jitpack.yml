@@ -7,4 +7,4 @@ install:
   make publish
 
 publish:
-  ./gradlew build javadoc publishToMavenLocal
+  ./gradlew compileJava javadoc publishToMavenLocal
