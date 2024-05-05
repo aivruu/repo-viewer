@@ -9,5 +9,5 @@ gson = "2.10.1"
 gson = { group = "com.google.code", name = "gson", version.ref = "gson" }
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
