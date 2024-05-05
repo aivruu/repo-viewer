@@ -1,16 +1,20 @@
 plugins {
     `java-library`
     `maven-publish`
+    alias(libs.plugins.indra)
     alias(libs.plugins.spotless)
     alias(libs.plugins.shadow)
 }
 
-java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
-
 repositories {
     mavenCentral()
+}
+
+indra {
+    javaVersions {
+        target(17)
+        minimumToolchain(17)
+    }
 }
 
 spotless {
@@ -41,6 +45,8 @@ tasks {
     shadowJar {
         archiveFileName.set(rootProject.name)
         minimize()
+
+        relocate("com.google.gson", "me.qeklydev.downloader.gson")
     }
 }
 
