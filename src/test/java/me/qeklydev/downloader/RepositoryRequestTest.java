@@ -1,6 +1,6 @@
 /*
  * This file is part of release-downloader - https://github.com/aivruu/release-downloader
- * Copyright (C) 2020-2024 Aivruu (https://github.com/aivruu)
+ * Copyright (C) 2020-2024 aivruu (https://github.com/aivruu)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,16 +41,16 @@ public class RepositoryRequestTest {
     System.out.println("Owner: " + repositoryModel.owner());
     System.out.println("Name: " + repositoryModel.name());
     System.out.println("Description: " + repositoryModel.description());
+    // We can skip the non-null check for the license type, because
+    // this repository have a defined license (GPL 3.0).
     System.out.println("License: {");
     System.out.println(" Key: " + license.name());
     System.out.println(" Name: " + license.fullName());
     System.out.println(" Url: " + license.url());
     System.out.println("}");
-    /*
-     * The release model can be null, but this repository does
-     * have a release published, so we can skip the null check.
-     */
-    System.out.println("Latest release: v" + repositoryModel.releaseModel().version());
+    // The release model can be null, but this repository does
+    // have a release published, so we can skip the null check.
+    System.out.println("Latest Release: " + repositoryModel.releaseModel().version());
     System.out.println("Forked: " + repositoryModel.isForked());
     System.out.println("Accept Forks: " + repositoryModel.canBeForked());
     System.out.println("Stars: " + repositoryModel.stars());
@@ -58,5 +58,10 @@ public class RepositoryRequestTest {
     System.out.println("Public: " + repositoryModel.isPublic());
     System.out.println("Archived: " + repositoryModel.isArchived());
     System.out.println("Most-Used Language: " + repositoryModel.language());
+    // Java 21 Feature
+    //
+    // After show all necessary repository information to the user,
+    // we close the http-client and not more request are accepted.
+    httpClient.close();
   }
 }
