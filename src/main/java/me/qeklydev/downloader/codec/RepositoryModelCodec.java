@@ -34,7 +34,18 @@ import me.qeklydev.downloader.repository.GitHubRepositoryModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Json deserializer implementation for handle provided
+ * json data for repository models serialization.
+ *
+ * @since 0.0.1
+ */
 public enum RepositoryModelCodec implements JsonDeserializer<GitHubRepositoryModel> {
+  /**
+   * Lazy-Singleton Used for rapid-access to class instance.
+   *
+   * @since 0.0.1
+   */
   INSTANCE;
 
   @Override

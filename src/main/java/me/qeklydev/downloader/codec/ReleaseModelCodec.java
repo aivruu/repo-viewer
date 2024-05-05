@@ -29,11 +29,16 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Json deserializer implementation for handle provided
- * json data files.
+ * json data for release models serialization.
  *
  * @since 0.0.1
  */
 public enum ReleaseModelCodec implements JsonDeserializer<ReleaseModel> {
+  /**
+   * Lazy-Singleton Used for rapid-access to class instance.
+   *
+   * @since 0.0.1
+   */
   INSTANCE;
 
   /**
