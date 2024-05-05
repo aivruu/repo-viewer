@@ -54,7 +54,7 @@ public record HTTPReleaseModelRequest(@NotNull HttpClient httpClient, @NotNull S
     try {
       final var request = HttpRequest.newBuilder()
           .GET()
-          .uri(new URI("{repository}/releases/latest" /* Java-21 Feature! :D */))
+          .uri(new URI(this.repository + "/releases/latest"))
           .build();
       final var asyncResponse = this.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
       // The repository request to the API is performed before this request
