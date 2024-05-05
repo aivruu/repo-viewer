@@ -52,7 +52,7 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
     // Check if the position given is negative, or the value
     // is higher than the size of the list.
     if ((position < 0) || position > assetsLength) {
-      LoggerUtils.error("Requested URL position cannot be negative, or be greater than the release assets amount -> {position} ; {assetsLength}");
+      LoggerUtils.error("Requested URL position cannot be negative, or be greater than the release assets amount.");
       return false;
     }
     final var provider = this.assets.get(position).split(":", 2);
