@@ -1,5 +1,5 @@
 [versions]
-shadow = "8.1.1"
+shadow = "8.1.7"
 spotless = "6.25.0"
 indra = "3.0.1"
 
@@ -10,6 +10,6 @@ gson = "2.10.1"
 gson = { group = "com.google.code", name = "gson", version.ref = "gson" }
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 indra = { id = "net.kyori.indra", version.ref = "indra" }
