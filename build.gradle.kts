@@ -12,8 +12,8 @@ repositories {
 
 indra {
     javaVersions {
-        target(17)
-        minimumToolchain(17)
+        target(21)
+        minimumToolchain(21)
     }
 }
 
