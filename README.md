@@ -35,7 +35,7 @@ tasks {
 ```
 
 ### Requirements
-- Java 17 or higher.
+- Java 21 or newer.
 
 ### Building
 This library use Gradle-Kotlin for project.
@@ -45,4 +45,4 @@ cd release-downloader
 ./gradlew build
 ```
 
-JDK 17 or newer is fully required.
+JDK 21 or newer is fully required.
