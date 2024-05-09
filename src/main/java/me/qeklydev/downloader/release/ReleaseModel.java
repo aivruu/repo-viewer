@@ -58,15 +58,13 @@ public record ReleaseModel(@NotNull String version, @NotNull List<@NotNull Strin
     final var provider = this.assets.get(position).split(":", 2);
     // We remove additional spaces for avoid exception throws.
     final var requestedUrl = provider[1].trim();
+    final var bytesAmountReadDuringOperation = IoAsyncUtils.downloadOf(
+        /* We specify the file name with his extension as first parameter. */ provider[0], requestedUrl).join();
     // We wait until completable-future has ended, and we obtain
     // the final result for that operation, and then we check if
     // this operation was successful verifying if read-bytes amount
     // is higher than zero, if it is true, the operation was success and
     // the asset was downloaded correctly, otherwise the operation failed.
-    final var bytesAmountReadDuringOperation = IoAsyncUtils.downloadOf(
-        provider[0].substring(0, provider[0].length() - 1),
-        requestedUrl
-    ).join();
     return bytesAmountReadDuringOperation > 0;
   }
 
