@@ -63,7 +63,7 @@ public enum ReleaseModelCodec implements JsonDeserializer<ReleaseModel> {
       final var assetObject = element.getAsJsonObject();
       assetsList.add(BUILDER.append(assetObject.get("name").getAsString())
           .append(": ")
-          .append(assetObject.get("url").getAsString())
+          .append(assetObject.get("browser_download_url").getAsString())
           .toString());
     }
     return new ReleaseModel(providedJsonObject.get("tag_name").getAsString(), assetsList);
