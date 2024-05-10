@@ -31,7 +31,7 @@ public class AssetDownloadTest {
         .connectTimeout(Duration.ofSeconds(5))
         .build();
     final var releaseModelRequest = new HTTPReleaseModelRequest(
-        httpClient, GitHubURLProvider.of("aivruu", "release-downloader"));
+        httpClient, GitHubURLProvider.of("java-decompiler", "jd-gui"));
     final var releaseModel = releaseModelRequest.provideModel();
     // Check if the repository have a release.
     if (releaseModel == null) {
