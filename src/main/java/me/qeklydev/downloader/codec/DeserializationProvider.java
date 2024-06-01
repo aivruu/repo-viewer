@@ -103,9 +103,8 @@ public final class DeserializationProvider {
       if (this.jsonBody == null || this.codecType == null) {
         throw new IllegalStateException("Json body or codec type for the deserialization have not been specified!");
       }
-      return switch (this.codecType) {
-        case RELEASE, REPOSITORY -> GSON_PROVIDER.fromJson(this.jsonBody, this.codecType.typeClass());
-      };
+      // Should never be null because codec-type specified always is valid.
+      return GSON_PROVIDER.fromJson(this.jsonBody, this.codecType.typeClass());
     }
   }
 
