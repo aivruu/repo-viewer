@@ -1,18 +1,16 @@
-# release-downloader
+# repo-viewer
 
-[![](https://jitpack.io/v/aivruu/release-downloader.svg)](https://jitpack.io/#aivruu/release-downloader)
+[![](https://jitpack.io/v/aivruu/repo-viewer.svg)](https://jitpack.io/#aivruu/repo-viewer)
 
-`release-downloader` is a library that provides utilities to obtain GitHub repositories information since HTTP requests, and allow download assets of the releases for the requested repositories of an easily way.
+`repo-viewer` is a library that provides utilities to obtain GitHub repositories information since HTTP requests, and allow download assets of the releases for the requested repositories of an easily way.
 
 > [!NOTE]\
-> This is a library that I created to testing HTTP utilities with Java. I taken as base [OcZi/release-watcher](https://github.com/OcZi/release-watcher) for the main idea of this project, later I decided to implement a downloader function type **(BETA)**.
-
-### Documentation
-- [Javadoc](https://jitpack.io/com/github/aivruu/release-downloader/latest/javadoc/)
+> This is a library that I created to testing HTTP utilities with Java. I taken as base [OcZi/release-watcher](https://github.com/OcZi/release-watcher) for the main idea of this project.
 
 ### Features
-* Obtain and view the repositories information easily with requests to the GitHub API.
-* Download assets of the releases for requested repositories.
+* View specified repository's information.
+* Easy to usage.
+* Download assets from each repository release.
 
 ### Download
 ```kotlin
@@ -22,27 +20,14 @@ repositories {
 
 dependencies {
   // You can visualize the latest version on the document header.
-  implementation("com.github.aivruu:release-downloader:VERSION")
-}
-
-tasks {
-  shadowJar {
-    // Relocating gson-lib dependency and release-downloader into specified packages.
-    relocate("com.google.gson", "com.yourPackage.com")
-    relocate("me.qeklydev.downloader", "com.yourPackage.com")
-  }
+  implementation("com.github.aivruu:repo-viewer:VERSION")
 }
 ```
-
-### Requirements
-- Java 21 or newer.
 
 ### Building
-This library use Gradle-Kotlin for project.
+This project require Gradle for building and management, and Java 21 as minimum.
 ```
-git clone https://github.com/aivruu/release-downloader.git
-cd release-downloader
+git clone https://github.com/aivruu/repo-viewer.git
+cd repo-viewer
 ./gradlew build
 ```
-
-JDK 21 or newer is fully required.
