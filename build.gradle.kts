@@ -1,59 +1,72 @@
 plugins {
-    `java-library`
-    `maven-publish`
-    alias(libs.plugins.indra)
-    alias(libs.plugins.spotless)
-    alias(libs.plugins.shadow)
+  `java-library`
+  `maven-publish`
+  alias(libs.plugins.indra)
+  alias(libs.plugins.spotless)
+  alias(libs.plugins.shadow)
 }
 
-repositories {
-    mavenCentral()
-}
+subprojects {
+  apply(plugin = "java-library")
+  apply(plugin = "maven-publish")
+  apply(plugin = "net.kyori.indra")
+  apply(plugin = "com.diffplug.spotless")
+  apply(plugin = "io.github.goooler.shadow")
 
-indra {
+  indra {
     javaVersions {
-        target(21)
-        minimumToolchain(21)
+      target(21)
+      minimumToolchain(21)
     }
-}
+  }
 
-spotless {
+  repositories {
+    mavenCentral()
+  }
+
+  spotless {
     java {
-        licenseHeaderFile("$rootDir/header.txt")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
+      licenseHeaderFile("$rootDir/license/header.txt")
+      removeUnusedImports()
+      trimTrailingWhitespace()
+      indentWithSpaces(2)
     }
     kotlinGradle {
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
+      trimTrailingWhitespace()
+      indentWithSpaces(2)
     }
-}
+  }
 
-dependencies {
-    compileOnly("org.jetbrains:annotations:24.0.1")
-    implementation("com.google.code.gson:gson:2.10.1")
-
+  dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-}
+  }
 
-tasks {
+  tasks {
     compileJava {
-        dependsOn("spotlessApply")
-        options.compilerArgs.add("-parameters")
+      dependsOn("spotlessApply")
+      options.compilerArgs.add("-parameters")
     }
     shadowJar {
-        archiveFileName.set(rootProject.name)
-        minimize()
+      archiveFileName.set(rootProject.name)
+      minimize()
 
-        relocate("com.google.gson", "me.qeklydev.downloader.gson")
+      // Package expected to use as final directory for dependencies used.
+      val relocationFinalPackage = "io.github.aivruu.repoviewer.libs"
+
+      relocate("org.jetbrains.annotations", "$relocationFinalPackage.org.jetbrains.annotations")
+      relocate("com.google.gson", "$relocationFinalPackage.com.google.gson")
     }
-}
+  }
 
-publishing {
+  publishing {
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
+      create<MavenPublication>("maven") {
+        groupId = "io.github.aivruu.repoviewer"
+        artifactId = project.name
+        version = project.version.toString()
+
+        from(components["java"])
+      }
     }
+  }
 }
