@@ -3,4 +3,4 @@
  *
  * @since 0.1.2
  */
-package me.qeklydev.downloader.logger;
+package io.github.aivruu.repoviewer.api.logger;

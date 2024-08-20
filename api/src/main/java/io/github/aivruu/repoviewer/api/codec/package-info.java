@@ -4,4 +4,4 @@
  *
  * @since 0.0.1
  */
-package me.qeklydev.downloader.codec;
+package io.github.aivruu.repoviewer.api.codec;
