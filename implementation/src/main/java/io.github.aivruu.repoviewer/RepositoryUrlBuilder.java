@@ -31,7 +31,7 @@ public final class RepositoryUrlBuilder {
 
   /**
    * Returns a new {@link String} using the GitHub's API url as base for given parameters
-   * fusion into that url.
+   * merging for that url.
    *
    * @param user the user to search.
    * @param repository the repository of the user.
