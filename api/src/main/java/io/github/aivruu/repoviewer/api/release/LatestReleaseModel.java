@@ -78,7 +78,7 @@ public record LatestReleaseModel(String version, String[] assets) implements Req
     return CompletableFuture.supplyAsync(() -> {
       var downloadedAssetsAmount = 0;
       for (final var asset : this.assets) {
-        final var assetParts = asset.split(":", 2);
+        final var assetParts = asset.split("->", 2);
         final var readBytesAmount = DownloaderUtils.fromUrlToFile(directory, assetParts[0], assetParts[1].trim());
         if (readBytesAmount <= 0) {
           continue;
