@@ -19,6 +19,7 @@ package io.github.aivruu.repoviewer;
 import io.github.aivruu.repoviewer.api.http.GithubHttpRequestModel;
 import io.github.aivruu.repoviewer.api.logger.LoggerUtils;
 import io.github.aivruu.repoviewer.api.release.LatestReleaseModel;
+import io.github.aivruu.repoviewer.codec.CodecProviderImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
