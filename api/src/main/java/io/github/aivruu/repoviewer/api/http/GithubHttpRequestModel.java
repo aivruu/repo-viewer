@@ -79,21 +79,20 @@ public interface GithubHttpRequestModel<Model extends RequestableModel> {
 
   /**
    * Realizes an internal execution to {@link #requestUsingThen(HttpClient, int, Consumer)} using the
-   * given parameters, and a non-configured http-client for the request handling.
+   * given parameters, and a non-configured http-client for the request handling that will be closed
+   * once the request has been made.
    *
    * @param timeout the time-out for this request.
    * @param consumer the logic to execute with the given model, if the request produced a
    *                 response ({@code json-body}).
    * @return The {@link CompletableFuture} with a {@code nullable} model.
+   * @see #requestUsingThen(HttpClient, int, Consumer)
    * @since 2.3.4
    */
   default CompletableFuture<@Nullable Model> requestThen(final int timeout, Consumer<Model> consumer) {
     final var httpClient = HttpClient.newHttpClient();
-    final var requestModelResponse = this.requestUsing(httpClient, timeout);
-    // Execute the consumer's logic if the model isn't null.
-    requestModelResponse.thenAccept(model -> {
-      if (model != null) consumer.accept(model);
-    }).thenRun(httpClient::close); // Close http-client after the request.
+    final var requestModelResponse = this.requestUsingThen(httpClient, timeout, consumer);
+    httpClient.close(); // Close http-client after the request.
     return requestModelResponse;
   }
 }
