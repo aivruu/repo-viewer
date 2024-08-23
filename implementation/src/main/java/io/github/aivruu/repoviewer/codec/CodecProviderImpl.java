@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
-package io.github.aivruu.repoviewer;
+package io.github.aivruu.repoviewer.codec;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,8 +22,6 @@ import io.github.aivruu.repoviewer.api.codec.CodecProvider;
 import io.github.aivruu.repoviewer.api.http.request.RequestableModel;
 import io.github.aivruu.repoviewer.api.release.LatestReleaseModel;
 import io.github.aivruu.repoviewer.api.repository.GithubRepositoryModel;
-import io.github.aivruu.repoviewer.codec.type.RepositoryCodec;
-import io.github.aivruu.repoviewer.codec.type.RepositoryReleaseCodec;
 import org.jetbrains.annotations.Nullable;
 
 /**

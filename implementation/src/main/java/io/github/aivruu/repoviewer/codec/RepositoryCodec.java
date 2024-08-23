@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
-package io.github.aivruu.repoviewer.codec.type;
+package io.github.aivruu.repoviewer.codec;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
