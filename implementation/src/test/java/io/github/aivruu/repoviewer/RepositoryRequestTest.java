@@ -24,15 +24,12 @@ public class RepositoryRequestTest {
   void repositoryRequest() {
     final var repositoryHttpRequest = new RepositoryHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
     System.out.print("Requesting repository from: " + repositoryHttpRequest.repository());
-    final var requestResponse = repositoryHttpRequest.request(5);
-    Assertions.assertNotNull(requestResponse,
-      "Request response wasn't provided, check the given repository url for valid syntax.");
-
+    final var requestResponse = repositoryHttpRequest.requestThen(5, repositoryModel ->
+      System.out.print("Requested repository %s deserialized correctly".formatted(repositoryModel.name())));
     requestResponse.thenAccept(repositoryModel -> {
       if (repositoryModel == null) {
         Assertions.fail("Failed to deserialize the json response into a GithubRepositoryModel.");
       }
-      System.out.print("Requested repository %s deserialized correctly".formatted(repositoryModel.name()));
     });
   }
 }

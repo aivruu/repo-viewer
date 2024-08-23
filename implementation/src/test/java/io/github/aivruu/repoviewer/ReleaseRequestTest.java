@@ -24,14 +24,15 @@ public class ReleaseRequestTest {
   void releaseRequest() {
     final var releaseHttpRequest = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
     System.out.println("Requesting latest-release for repository: " + releaseHttpRequest.repository());
-    final var requestResponse = releaseHttpRequest.request(10);
+    final var requestResponse = releaseHttpRequest.requestThen(10, latestReleaseModel -> {
+      System.out.println("Requested repository's latest-release %s deserialized correctly: %s"
+        .formatted(latestReleaseModel.version(), latestReleaseModel.assets()[0]));
+    });
     System.out.println("Made request for repository correctly.");
     requestResponse.thenAccept(latestReleaseModel -> {
       if (latestReleaseModel == null) {
         Assertions.fail("Failed to deserialize json response into a LatestReleaseModel.");
       }
-      System.out.println("Requested repository's latest-release %s deserialized correctly: %s"
-        .formatted(latestReleaseModel.version(), latestReleaseModel.assets()[0]));
     });
   }
 }
