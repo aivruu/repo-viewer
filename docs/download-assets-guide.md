@@ -9,39 +9,25 @@ given their required parameters, and handle them for possible results:
 
 ```java
 // ...
-requestHttpModel.thenAccept(latestReleaseModel -> {
-  if (latestReleaseModel == null) return;
+if (latestReleaseModel == null) return;
+final var downloadedFileDirectory = new File("downloads");
+if (!downloadedFileDirectory.exists()) downloadedFileDirectory.mkdir();
 
-  final var downloadedFileDirectory = new File("downloads");
-  if (!downloadedFileDirectory.exists()) downloadedFileDirectory.mkdir();
-
-  latestReleaseModel.downloadFrom(downloadedFileDirectory, 0)}
-    .whenComplete((downloaded, exception) ->
-      if (exception != null) System.out.println("An exception has happened during download!");
-    )
-    .thenAccept(downloaded ->
-      if (downloaded) System.out.println("File downloaded"); 
-    );
+latestReleaseModel.downloadFrom(downloadedFileDirectory, 0).thenAccept(downloaded -> {
+  if (downloaded) System.out.println("File downloaded"); 
 });
 // ...
 ```
 An example downloading a single file into an expected directory.
 ```java
 // ...
-requestHttpModel.thenAccept(latestReleaseModel -> {
-  if (latestReleaseModel == null) return;
+if (latestReleaseModel == null) return;
+final var filesDirectory = new File("downloads");
+if (!filesDirectory.exists()) filesDirectory.mkdir();
 
-  final var filesDirectory = new File("downloads");
-  if (!filesDirectory.exists()) filesDirectory.mkdir();
-
-  latestReleaseModel.downloadAll(downloadedFileDirectory)}
-    .whenComplete((downloaded, exception) ->
-      if (exception != null) System.out.println("An exception has happened during download!");
-    )
-    .thenAccept(downloaded -> {
-      if (downloaded) System.out.println("Files downloaded");
-      else System.out.println("No files downloaded.");
-    });
+latestReleaseModel.downloadAll(downloadedFileDirectory).thenAccept(downloaded -> {
+  if (downloaded) System.out.println("Files downloaded");
+  else System.out.println("No files downloaded.");
 });
 // ...
 ```
