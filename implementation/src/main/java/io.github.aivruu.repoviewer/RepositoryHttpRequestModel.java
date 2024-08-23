@@ -17,7 +17,6 @@
 package io.github.aivruu.repoviewer;
 
 import io.github.aivruu.repoviewer.api.http.GithubHttpRequestModel;
-import io.github.aivruu.repoviewer.api.logger.LoggerUtils;
 import io.github.aivruu.repoviewer.api.repository.GithubRepositoryModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +29,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * This {@link GithubHttpRequestModel} implementation is used to handle http-request for the
@@ -42,11 +42,18 @@ public record RepositoryHttpRequestModel(@NotNull String repository) implements 
   @Override
   public CompletableFuture<@Nullable GithubRepositoryModel> requestUsing(final HttpClient httpClient, final int timeout) {
     final var responseJsonBody = this.response(httpClient, timeout);
-    return responseJsonBody.whenComplete((response, exception) -> {
-      if (exception != null) {
-        LoggerUtils.error("Request for '%s' repository could not be completed.".formatted(this.repository));
-      }
-    }).thenApply(response -> CodecProviderImpl.INSTANCE.from(GithubRepositoryModel.class, response));
+    return responseJsonBody.thenApply(response -> CodecProviderImpl.INSTANCE.from(GithubRepositoryModel.class, response));
+  }
+
+  @Override
+  public CompletableFuture<@Nullable GithubRepositoryModel> requestUsingThen(final HttpClient httpClient, final int timeout,
+                                                                             final Consumer<GithubRepositoryModel> consumer) {
+    final var responsesJsonBody = this.response(httpClient, timeout);
+    return responsesJsonBody.thenApply(response -> {
+      final var repositoryModel = CodecProviderImpl.INSTANCE.from(GithubRepositoryModel.class, response);
+      if (repositoryModel != null) consumer.accept(repositoryModel);
+      return repositoryModel;
+    });
   }
 
   private CompletableFuture<String> response(final HttpClient httpClient, final int timeout) {
@@ -61,6 +68,9 @@ public record RepositoryHttpRequestModel(@NotNull String repository) implements 
       } catch (final IOException | InterruptedException | URISyntaxException exception) {
         return null;
       }
+    }, EXECUTOR).exceptionally(exception -> {
+      exception.printStackTrace();
+      return null;
     });
   }
 }

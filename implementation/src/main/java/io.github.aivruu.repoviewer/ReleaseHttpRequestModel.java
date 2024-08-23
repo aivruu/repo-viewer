@@ -30,6 +30,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * This {@link GithubHttpRequestModel} implementation is used to handle http-requests for the
@@ -42,12 +43,18 @@ public record ReleaseHttpRequestModel(@NotNull String repository) implements Git
   @Override
   public CompletableFuture<@Nullable LatestReleaseModel> requestUsing(final HttpClient httpClient, final int timeout) {
     final var responseJsonBody = this.response(httpClient, timeout);
-    return responseJsonBody.whenComplete((response, exception) -> {
-      if (exception != null) {
-        LoggerUtils.error("Request for latest-release of '%s' repository could not be completed."
-          .formatted(this.repository));
-      }
-    }).thenApply(response -> CodecProviderImpl.INSTANCE.from(LatestReleaseModel.class, response));
+    return responseJsonBody.thenApply(response -> CodecProviderImpl.INSTANCE.from(LatestReleaseModel.class, response));
+  }
+
+  @Override
+  public CompletableFuture<@Nullable LatestReleaseModel> requestUsingThen(final HttpClient httpClient, final int timeout,
+                                                                          final Consumer<LatestReleaseModel> consumer) {
+    final var responseJsonBody = this.response(httpClient, timeout);
+    return responseJsonBody.thenApply(response -> {
+      final var releaseModel = CodecProviderImpl.INSTANCE.from(LatestReleaseModel.class, response);
+      if (releaseModel != null) consumer.accept(releaseModel);
+      return releaseModel;
+    });
   }
 
   private CompletableFuture<String> response(final HttpClient httpClient, final int timeout) {
@@ -62,6 +69,10 @@ public record ReleaseHttpRequestModel(@NotNull String repository) implements Git
       } catch (final IOException | InterruptedException | URISyntaxException exception) {
         return null;
       }
+    }, EXECUTOR).exceptionally(exception -> {
+      LoggerUtils.error("Request for latest-release of '%s' repository could not be completed."
+        .formatted(this.repository));
+      return null;
     });
   }
 }
