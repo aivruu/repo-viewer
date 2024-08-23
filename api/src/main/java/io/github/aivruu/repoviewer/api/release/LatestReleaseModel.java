@@ -22,6 +22,8 @@ import org.jetbrains.annotations.Contract;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This {@link RequestableModel} implementation is used to proportionate access to the
@@ -32,6 +34,9 @@ import java.util.concurrent.CompletableFuture;
  * @since 0.0.1
  */
 public record LatestReleaseModel(String version, String[] assets) implements RequestableModel {
+  private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3,
+    r -> new Thread(r, "ReleaseAssetsDownloader-Thread"));
+
   @Override
   public String urlForRequest() {
     throw new UnsupportedOperationException("This function is expected to be implemented in a future version.");
@@ -62,6 +67,9 @@ public record LatestReleaseModel(String version, String[] assets) implements Req
       // If something went wrong during the process, or there's nothing to download,
       // will return false, otherwise, return true.
       return readBytesAmount > 0;
+    }, EXECUTOR).exceptionally(exception -> {
+      exception.printStackTrace();
+      return false;
     });
   }
 
@@ -87,6 +95,9 @@ public record LatestReleaseModel(String version, String[] assets) implements Req
         downloadedAssetsAmount++;
       }
       return downloadedAssetsAmount > 0;
+    }, EXECUTOR).exceptionally(exception -> {
+      exception.printStackTrace();
+      return false;
     });
   }
 
