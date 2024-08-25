@@ -16,6 +16,7 @@
 //
 package io.github.aivruu.repoviewer.api.release;
 
+import io.github.aivruu.repoviewer.api.download.status.DownloadStatusProvider;
 import io.github.aivruu.repoviewer.api.http.request.RequestableModel;
 import io.github.aivruu.repoviewer.api.download.DownloaderUtils;
 import org.jetbrains.annotations.Contract;
@@ -34,7 +35,8 @@ import java.util.concurrent.Executors;
  * @since 0.0.1
  */
 public record LatestReleaseModel(String version, String[] assets) implements RequestableModel {
-  private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3,
+  /** Used for download-operations for this release's assets. */
+  private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(2,
     r -> new Thread(r, "ReleaseAssetsDownloader-Thread"));
 
   @Override
@@ -53,23 +55,21 @@ public record LatestReleaseModel(String version, String[] assets) implements Req
    *
    * @param directory the directory to where the asset is going to be downloaded.
    * @param position the asset's position at the array.
-   * @return The {@link CompletableFuture} with the boolean-result for this operation.
+   * @return The {@link CompletableFuture} with the {@link DownloadStatusProvider}.
+   * @see DownloaderUtils#fromUrlToFileWithDirectory(File, String, String)
    * @since 2.3.4
    */
-  public CompletableFuture<Boolean> downloadFrom(final File directory, final int position) {
+  public CompletableFuture<DownloadStatusProvider> downloadFrom(final File directory, final int position) {
     return CompletableFuture.supplyAsync(() -> {
-      if ((position < 0) || position > this.assets.length) {
-        return false;
+      if (position < 0 || position > this.assets.length) {
+        return DownloadStatusProvider.unknownAssetToDownload();
       }
       final var parts = this.assets[position].split("->", 2);
-      final var readBytesAmount = DownloaderUtils.fromUrlToFile(directory, /* File-name with extension. */ parts[0],
-        /* URL without extra-spaces. */ parts[1].trim());
-      // If something went wrong during the process, or there's nothing to download,
-      // will return false, otherwise, return true.
-      return readBytesAmount > 0;
+      return DownloaderUtils.fromUrlToFileWithDirectory(directory,
+        /* File-name with extension. */ parts[0], /* URL without extra-spaces. */ parts[1].trim());
     }, EXECUTOR).exceptionally(exception -> {
       exception.printStackTrace();
-      return false;
+      return DownloadStatusProvider.assetDownloadError();
     });
   }
 
@@ -78,26 +78,26 @@ public record LatestReleaseModel(String version, String[] assets) implements Req
    * located at the array for this release of the specified repository.
    *
    * @param directory the directory to where assets is going to be downloaded.
-   * @return The {@link CompletableFuture} with the boolean-result for this operation.
-   * @see DownloaderUtils#fromUrlToFile(File, String, String)
-   * @since 1.0.0
+   * @return The {@link CompletableFuture} with a boolean-state for this operation.
+   * @see DownloaderUtils#fromUrlToFileWithDirectory(File, String, String)
+   * @since 2.3.4
    */
-  public CompletableFuture<Boolean> downloadAll(final File directory) {
+  public CompletableFuture<Integer> downloadAll(final File directory) {
     return CompletableFuture.supplyAsync(() -> {
       var downloadedAssetsAmount = 0;
       for (final var asset : this.assets) {
         final var assetParts = asset.split("->", 2);
-        final var readBytesAmount = DownloaderUtils.fromUrlToFile(directory, assetParts[0], assetParts[1].trim());
-        if (readBytesAmount <= 0) {
+        final var downloadStatusProvider = DownloaderUtils.fromUrlToFileWithDirectory(directory, assetParts[0], assetParts[1].trim());
+        if (!downloadStatusProvider.finished()) {
           continue;
         }
-        // Another asset was downloaded correctly.
+        // Current iterated asset was downloaded correctly.
         downloadedAssetsAmount++;
       }
-      return downloadedAssetsAmount > 0;
+      return downloadedAssetsAmount;
     }, EXECUTOR).exceptionally(exception -> {
       exception.printStackTrace();
-      return false;
+      return -1;
     });
   }
 
