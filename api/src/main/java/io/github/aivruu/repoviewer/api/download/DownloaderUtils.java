@@ -16,6 +16,8 @@
 //
 package io.github.aivruu.repoviewer.api.download;
 
+import io.github.aivruu.repoviewer.api.download.status.DownloadStatusProvider;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,14 +40,14 @@ public final class DownloaderUtils {
    *
    * @param fileName the name of the file to be written.
    * @param from the url for the download.
-   * @return The amount of read bytes for this operation, following expected logic for the
-   *     {@link #fromUrlToFile(File, String)} function.
+   * @return A {@link DownloadStatusProvider} with the {@code status-code} and the read {@code bytes-amount}
+   *     for the operation.
    * @see #fromUrlToFile(File, String)
    * @since 2.3.4
    */
-  public static long fromUrlToFile(final File directory, final String fileName, final String from) {
-    final var expectedFile = new File(directory, fileName);
-    return fromUrlToFile(expectedFile, from);
+  public static DownloadStatusProvider fromUrlToFileWithDirectory(final File directory, final String fileName,
+                                                                  final String from) {
+    return fromUrlToFile(new File(directory, fileName), from);
   }
 
   /**
@@ -53,11 +55,25 @@ public final class DownloaderUtils {
    *
    * @param file the file where download's content will be written.
    * @param from the url from where the content is going to be downloaded.
-   * @return The amount of read bytes for this operation, could return {@code 0} if nothing
-   *     was downloaded, or {@code -1} if something went wrong during the process.
+   * @return A {@link DownloadStatusProvider} with the {@code status-code} and the read {@code bytes-amount}
+   *     for the operation ending.
+   *     <p>
+   *     - {@link DownloadStatusProvider#assetDownloadFinished(long)} if the download was successful, will
+   *     return it with the read-bytes amount.
+   *     <p>
+   *     - {@link DownloadStatusProvider#unknownAssetToDownload()} if any asset was downloaded, nothing to
+   *     download.
+   *     <p>
+   *     - {@link DownloadStatusProvider#assetDownloadError()} if an error occurred during the downloading
+   *     process.
+   * @see DownloadStatusProvider#ASSET_DOWNLOAD_FINISHED
+   * @see DownloadStatusProvider#UNKNOWN_ASSET_TO_DOWNLOAD
+   * @see DownloadStatusProvider#UNEXISTING_ASSET_DEFAULT_SIZE
+   * @see DownloadStatusProvider#ASSET_DOWNLOAD_ERROR
+   * @see DownloadStatusProvider#INVALID_ASSET_DEFAULT_SIZE
    * @since 2.3.4
    */
-  public static long fromUrlToFile(final File file, final String from) {
+  public static DownloadStatusProvider fromUrlToFile(final File file, final String from) {
     // Using the provided URL we create a new URI object with this
     // same url, this method will throw an exception if given url
     // syntax is not valid, and will provide a message for error
@@ -68,10 +84,13 @@ public final class DownloaderUtils {
     // at the given position.
     try (final var readableByteChannel = Channels.newChannel(uriFromGiven.toURL().openStream());
          final var fileOutputStream = new FileOutputStream(file)) {
-      return fileOutputStream.getChannel().transferFrom(readableByteChannel,
+      final var transferBytesReat = fileOutputStream.getChannel().transferFrom(readableByteChannel,
         /* The initial position for bytes transfer. */ 0, Long.MAX_VALUE);
+      return (transferBytesReat == 0)
+        ? DownloadStatusProvider.unknownAssetToDownload()
+        : DownloadStatusProvider.assetDownloadFinished(transferBytesReat);
     } catch (final IOException exception) {
-      return -1;
+      return DownloadStatusProvider.assetDownloadError();
     }
   }
 }
