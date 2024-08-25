@@ -16,7 +16,7 @@
 //
 package io.github.aivruu.repoviewer.api.http;
 
-roivimport io.github.aivruu.repoviewer.api.codec.CodecProvider;
+import io.github.aivruu.repoviewer.api.codec.CodecProvider;
 import io.github.aivruu.repoviewer.api.http.request.RequestableModel;
 import io.github.aivruu.repoviewer.api.http.status.ResponseStatusProvider;
 import org.jetbrains.annotations.Nullable;
