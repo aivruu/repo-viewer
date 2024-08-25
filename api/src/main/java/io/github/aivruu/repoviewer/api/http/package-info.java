@@ -1,5 +1,6 @@
 /**
- * Provides base-interface and model for http-requests to GitHub's API.
+ * Provides request-interface, model-interface and status-provider for http-requests
+ * to the GitHub API.
  *
  * @since 0.0.1
  */
