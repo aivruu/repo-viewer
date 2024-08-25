@@ -24,15 +24,10 @@ public class ReleaseRequestTest {
   void releaseRequest() {
     final var releaseHttpRequest = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
     System.out.println("Requesting latest-release for repository: " + releaseHttpRequest.repository());
-    final var requestResponse = releaseHttpRequest.requestThen(10, latestReleaseModel -> {
+    final var responseStatusProvider = releaseHttpRequest.requestThen(10, latestReleaseModel ->
       System.out.println("Requested repository's latest-release %s deserialized correctly: %s"
-        .formatted(latestReleaseModel.version(), latestReleaseModel.assets()[0]));
-    });
-    System.out.println("Made request for repository correctly.");
-    requestResponse.thenAccept(latestReleaseModel -> {
-      if (latestReleaseModel == null) {
-        Assertions.fail("Failed to deserialize json response into a LatestReleaseModel.");
-      }
-    });
+        .formatted(latestReleaseModel.version(), latestReleaseModel.assets()[0]))
+    ).join(); // Wait until future is complete and status-provider is got.
+    Assertions.assertTrue(responseStatusProvider.valid(), "Failed to get release-model for this repository.");
   }
 }

@@ -27,11 +27,11 @@ public class AssetsDownloadTest {
   void downloadTest() {
     // We create a custom release-model for this test.
     final var latestReleaseModel = new LatestReleaseModel("1.3.4",
-      new String[]{ "release-downloader->https://github.com/aivruu/repo-viewer/releases/download/1.3.4/release-downloader-1.3.4.jar" });
+      new String[]{ "release-downloader-1.3.4.jar->https://github.com/aivruu/repo-viewer/releases/download/1.3.4/release-downloader-1.3.4.jar" });
     final var destinationDirectory = new File("downloads");
     if (!destinationDirectory.exists()) destinationDirectory.mkdir();
 
-    latestReleaseModel.downloadFrom(destinationDirectory, 0).thenAccept(downloaded ->
-      Assertions.assertTrue(downloaded, "Appears that all, or some assets, where not downloaded."));
+    final var fileDownloaded = latestReleaseModel.downloadFrom(destinationDirectory, 0).join();
+    Assertions.assertTrue(fileDownloaded.finished(), "The asset couldn't be downloaded.");
   }
 }
