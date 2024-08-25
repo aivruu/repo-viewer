@@ -17,7 +17,6 @@
 package io.github.aivruu.repoviewer;
 
 import io.github.aivruu.repoviewer.api.RequestConstants;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * This class is used to create formatted GitHub's API usable URLs.
@@ -38,7 +37,7 @@ public final class RepositoryUrlBuilder {
    * @return A URL formatted for HTTPS requests to GitHub API.
    * @since 2.3.4
    */
-  public static @NotNull String from(final @NotNull String user, final @NotNull String repository) {
+  public static String from(final String user, final String repository) {
     return RequestConstants.GITHUB_API_URL.formatted(user, repository);
   }
 }
