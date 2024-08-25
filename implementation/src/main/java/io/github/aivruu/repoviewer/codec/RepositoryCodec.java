@@ -45,7 +45,14 @@ public enum RepositoryCodec implements JsonDeserializer<GithubRepositoryModel> {
       return null;
     }
     final var repositoryOwner = jsonObject.get("owner").getAsJsonObject().get("login").getAsString();
-    final var license = jsonObject.get("license").getAsJsonObject().get("key").getAsString();
+    final var licenseNode = jsonObject.get("license");
+    var license = "";
+    // Avoid failures during pre-testing due to non-detected or unavailable license on current repository.
+    if (licenseNode.isJsonNull()) {
+      license = "unknown";
+    } else {
+      license = licenseNode.getAsJsonObject().get("name").getAsString();
+    }
     return RepositoryModelBuilder.newBuilder()
       .owner(repositoryOwner)
       .name(jsonObject.get("name").getAsString())
