@@ -9,3 +9,6 @@ build
 
 # Ignore IDE project settings directory.
 .idea
+
+# Ignore assets-download test directory.
+api/downloads
