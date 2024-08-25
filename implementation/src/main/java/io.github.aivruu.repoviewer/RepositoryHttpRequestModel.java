@@ -17,12 +17,12 @@
 package io.github.aivruu.repoviewer;
 
 import io.github.aivruu.repoviewer.api.http.GithubHttpRequestModel;
+import io.github.aivruu.repoviewer.api.http.status.ResponseStatusProvider;
 import io.github.aivruu.repoviewer.api.repository.GithubRepositoryModel;
 import io.github.aivruu.repoviewer.codec.CodecProviderImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -41,37 +41,30 @@ import java.util.function.Consumer;
  */
 public record RepositoryHttpRequestModel(@NotNull String repository) implements GithubHttpRequestModel<GithubRepositoryModel> {
   @Override
-  public CompletableFuture<@Nullable GithubRepositoryModel> requestUsing(final HttpClient httpClient, final int timeout) {
-    final var responseJsonBody = this.response(httpClient, timeout);
-    return responseJsonBody.thenApply(response -> CodecProviderImpl.INSTANCE.from(GithubRepositoryModel.class, response));
+  public CompletableFuture<ResponseStatusProvider<
+    @Nullable GithubRepositoryModel>> requestUsing(final HttpClient httpClient, final int timeout
+  ) {
+    return this.response(httpClient, timeout).thenApply(response ->
+      GithubHttpRequestModel.verifyAndProvideResponse(response, null, CodecProviderImpl.INSTANCE, GithubRepositoryModel.class));
   }
 
   @Override
-  public CompletableFuture<@Nullable GithubRepositoryModel> requestUsingThen(final HttpClient httpClient, final int timeout,
-                                                                             final Consumer<GithubRepositoryModel> consumer) {
-    final var responsesJsonBody = this.response(httpClient, timeout);
-    return responsesJsonBody.thenApply(response -> {
-      final var repositoryModel = CodecProviderImpl.INSTANCE.from(GithubRepositoryModel.class, response);
-      if (repositoryModel != null) consumer.accept(repositoryModel);
-      return repositoryModel;
-    });
+  public CompletableFuture<ResponseStatusProvider<
+    @Nullable GithubRepositoryModel>> requestUsingThen(final HttpClient httpClient, final int timeout, final Consumer<GithubRepositoryModel> consumer
+  ) {
+    return this.response(httpClient, timeout).thenApply(response ->
+      GithubHttpRequestModel.verifyAndProvideResponse(response, consumer, CodecProviderImpl.INSTANCE, GithubRepositoryModel.class));
   }
 
-  private CompletableFuture<String> response(final HttpClient httpClient, final int timeout) {
-    return CompletableFuture.supplyAsync(() -> {
-      try {
-        final var request = HttpRequest.newBuilder().GET()
-          .timeout(Duration.ofSeconds(timeout))
-          .uri(new URI(this.repository))
-          .build();
-        final var requestReceivedResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        return requestReceivedResponse.body(); // Returns the json-body provided by the request's response.
-      } catch (final IOException | InterruptedException | URISyntaxException exception) {
-        return null;
-      }
-    }, EXECUTOR).exceptionally(exception -> {
-      exception.printStackTrace();
-      return null;
-    });
+  private CompletableFuture<@Nullable HttpResponse<String>> response(final HttpClient httpClient, final int timeout) {
+    try {
+      final var request = HttpRequest.newBuilder().GET()
+        .timeout(Duration.ofSeconds(timeout))
+        .uri(new URI(this.repository))
+        .build();
+      return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    } catch (final URISyntaxException exception) {
+      return CompletableFuture.supplyAsync(() -> null, EXECUTOR);
+    }
   }
 }

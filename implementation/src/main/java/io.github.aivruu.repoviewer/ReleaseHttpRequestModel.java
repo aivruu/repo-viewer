@@ -17,13 +17,11 @@
 package io.github.aivruu.repoviewer;
 
 import io.github.aivruu.repoviewer.api.http.GithubHttpRequestModel;
-import io.github.aivruu.repoviewer.api.logger.LoggerUtils;
+import io.github.aivruu.repoviewer.api.http.status.ResponseStatusProvider;
 import io.github.aivruu.repoviewer.api.release.LatestReleaseModel;
 import io.github.aivruu.repoviewer.codec.CodecProviderImpl;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -40,40 +38,32 @@ import java.util.function.Consumer;
  * @param repository the specified repository's url.
  * @since 0.0.1
  */
-public record ReleaseHttpRequestModel(@NotNull String repository) implements GithubHttpRequestModel<LatestReleaseModel> {
+public record ReleaseHttpRequestModel(String repository) implements GithubHttpRequestModel<LatestReleaseModel> {
   @Override
-  public CompletableFuture<@Nullable LatestReleaseModel> requestUsing(final HttpClient httpClient, final int timeout) {
-    final var responseJsonBody = this.response(httpClient, timeout);
-    return responseJsonBody.thenApply(response -> CodecProviderImpl.INSTANCE.from(LatestReleaseModel.class, response));
+  public CompletableFuture<ResponseStatusProvider<
+    @Nullable LatestReleaseModel>> requestUsing(final HttpClient httpClient, final int timeout
+  ) {
+    return this.response(httpClient, timeout).thenApply(response ->
+      GithubHttpRequestModel.verifyAndProvideResponse(response, null, CodecProviderImpl.INSTANCE, LatestReleaseModel.class));
   }
 
   @Override
-  public CompletableFuture<@Nullable LatestReleaseModel> requestUsingThen(final HttpClient httpClient, final int timeout,
-                                                                          final Consumer<LatestReleaseModel> consumer) {
-    final var responseJsonBody = this.response(httpClient, timeout);
-    return responseJsonBody.thenApply(response -> {
-      final var releaseModel = CodecProviderImpl.INSTANCE.from(LatestReleaseModel.class, response);
-      if (releaseModel != null) consumer.accept(releaseModel);
-      return releaseModel;
-    });
+  public CompletableFuture<ResponseStatusProvider<
+    @Nullable LatestReleaseModel>> requestUsingThen(final HttpClient httpClient, final int timeout, final Consumer<LatestReleaseModel> consumer
+  ) {
+    return this.response(httpClient, timeout).thenApply(response ->
+      GithubHttpRequestModel.verifyAndProvideResponse(response, consumer, CodecProviderImpl.INSTANCE, LatestReleaseModel.class));
   }
 
-  private CompletableFuture<String> response(final HttpClient httpClient, final int timeout) {
-    return CompletableFuture.supplyAsync(() -> {
-      try {
-        final var request = HttpRequest.newBuilder().GET()
-          .timeout(Duration.ofSeconds(timeout))
-          .uri(new URI(this.repository + "/releases/latest"))
-          .build();
-        final var requestReceivedResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        return requestReceivedResponse.body(); // Returns the json-body provided by the request's response.
-      } catch (final IOException | InterruptedException | URISyntaxException exception) {
-        return null;
-      }
-    }, EXECUTOR).exceptionally(exception -> {
-      LoggerUtils.error("Request for latest-release of '%s' repository could not be completed."
-        .formatted(this.repository));
-      return null;
-    });
+  private CompletableFuture<@Nullable HttpResponse<String>> response(final HttpClient httpClient, final int timeout) {
+    try {
+      final var request = HttpRequest.newBuilder().GET()
+        .timeout(Duration.ofSeconds(timeout))
+        .uri(new URI(this.repository + "/releases/latest"))
+        .build();
+      return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    } catch (final URISyntaxException exception) {
+      return CompletableFuture.supplyAsync(() -> null, EXECUTOR);
+    }
   }
 }
