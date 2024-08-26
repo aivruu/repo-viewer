@@ -35,9 +35,23 @@ public final class RepositoryUrlBuilder {
    * @param user the user to search.
    * @param repository the repository of the user.
    * @return A URL formatted for HTTPS requests to GitHub API.
-   * @since 2.3.4
+   * @since 3.3.4
    */
-  public static String from(final String user, final String repository) {
+  public static String fromRepository(final String user, final String repository) {
     return RequestConstants.GITHUB_API_URL.formatted(user, repository);
+  }
+
+  /**
+   * Returns a new {@link String} using the GitHub's API url for releases-getting using the given
+   * parameters for merging into the url.
+   *
+   * @param user the user to search.
+   * @param repository the repository of the user.
+   * @param release the release to get from the repository.
+   * @return A URL formatted for http-requests to that repository's release.
+   * @since 3.3.4
+   */
+  public static String fromRelease(final String user, final String repository, final String release) {
+    return RequestConstants.GITHUB_API_RELEASE_URL.formatted(user, repository, release);
   }
 }
