@@ -28,26 +28,23 @@ import java.util.concurrent.Executors;
 
 /**
  * This {@link RequestableModel} implementation is used to proportionate access to the
- * latest-release information for the requested-repository.
+ * specified release's information for the requested-repository.
  *
- * @param version the release version.
+ * @param author the release's author.
+ * @param tagName the release version.
+ * @param name the release name.
+ * @param uniqueId the release's unique id.
  * @param assets the list with the url and name of the assets for this release.
- * @since 0.0.1
+ * @since 3.3.4
  */
-public record LatestReleaseModel(String version, String[] assets) implements RequestableModel {
+public record RepositoryReleaseModel(String author, String tagName, String name, int uniqueId, String[] assets)
+  implements RequestableModel
+{
+  /** Used when the download-operations for this release's assets (not a single) failed. */
+  public static final int INVALID_DOWNLOADED_ASSETS_AMOUNT = -1;
   /** Used for download-operations for this release's assets. */
   private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(2,
     r -> new Thread(r, "ReleaseAssetsDownloader-Thread"));
-
-  @Override
-  public String urlForRequest() {
-    throw new UnsupportedOperationException("This function is expected to be implemented in a future version.");
-  }
-
-  @Override
-  public String browserUrlForRequest() {
-    throw new UnsupportedOperationException("This function is expected to be implemented in a future version.");
-  }
 
   /**
    * Creates a new {@link CompletableFuture} and tries to download the asset located
@@ -97,7 +94,7 @@ public record LatestReleaseModel(String version, String[] assets) implements Req
       return downloadedAssetsAmount;
     }, EXECUTOR).exceptionally(exception -> {
       exception.printStackTrace();
-      return -1;
+      return INVALID_DOWNLOADED_ASSETS_AMOUNT;
     });
   }
 
@@ -110,6 +107,32 @@ public record LatestReleaseModel(String version, String[] assets) implements Req
   @Contract(pure = true)
   public String[] semanticVersion() {
     // e.g 2.10.1 -> ["2", "10", "1"]
-    return this.version.split("\\.");
+    // or v2.3.4 -> ["v2", "3", "4"]
+    return this.tagName.split("\\.");
+  }
+
+  /**
+   * Realizes a comparing using the specified {@link VersionComparingOperators} type and the given target-version.
+   *
+   * @param comparingOperator the operator-type to use for this comparing.
+   * @param targetVersion the version to compare.
+   * @return A boolean-state indicating if the comparing for the specified operator returned true, otherwise false.
+   * @since 3.3.4
+   */
+  public boolean compareVersion(final VersionComparingOperators comparingOperator, final int targetVersion) {
+    // e.g. v2.10.1 -> v2101 -> 2101
+    // or 1.3.4 -> 134
+    final var versionStringToNumber = Integer.parseInt(this.tagName.replace(".", "").startsWith("v")
+      ? this.tagName.substring(1)
+      : this.tagName);
+    return switch (comparingOperator) {
+      case EQUAL -> versionStringToNumber == targetVersion;
+      case LESS -> versionStringToNumber < targetVersion;
+      case LESS_OR_EQUAL -> versionStringToNumber <= targetVersion;
+      case GREATER -> versionStringToNumber > targetVersion;
+      case GREATER_OR_EQUAL -> versionStringToNumber >= targetVersion;
+      // Should not happen never, but we define it to avoid syntax errors.
+      default -> false;
+    };
   }
 }
