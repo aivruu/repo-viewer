@@ -31,12 +31,14 @@ import org.jetbrains.annotations.Nullable;
 public record ResponseStatusProvider<Model>(byte status, @Nullable Model result) {
   /** The request's response was valid. */
   public static final byte REQUEST_VALID_RESPONSE = 0;
-  /** The response indicates a 'bad' status-code. */
-  public static final byte REQUEST_BAD_RESPONSE = 1;
-  /** The response indicates a 'unknown' status-code. */
-  public static final byte REQUEST_UNKNOWN_RESPONSE = 2;
-  /** The response wasn't provided. */
-  public static final byte REQUEST_INVALID_RESPONSE = 3;
+  /** The response indicates a 'unauthorized' (401) status-code, only used on release-requests. */
+  public static final byte REQUEST_UNAUTHORIZED_RESPONSE = 1;
+  /** The response indicates a 'moved-permanently' (301) status-code, only used on repository-requests. */
+  public static final byte REQUEST_MOVED_PERMANENTLY_RESPONSE = 2;
+  /** The response indicates a 'forbidden' (403) status-code, only used on repository-requests. */
+  public static final byte REQUEST_FORBIDDEN_RESPONSE = 3;
+  /** The response wasn't provided, or the status-code type is 'not-found' (404). */
+  public static final byte REQUEST_INVALID_RESPONSE = 4;
 
   /**
    * Creates a new instance of {@link ResponseStatusProvider} with the {@link #REQUEST_VALID_RESPONSE}
@@ -52,27 +54,39 @@ public record ResponseStatusProvider<Model>(byte status, @Nullable Model result)
   }
 
   /**
-   * Creates a new instance of {@link ResponseStatusProvider} with the {@link #REQUEST_BAD_RESPONSE}
+   * Creates a new instance of {@link ResponseStatusProvider} with the {@link #REQUEST_UNAUTHORIZED_RESPONSE}
    * status-code, and a {@code null} model-type.
    *
    * @param <Model> an object which implements the {@link RequestableModel} interface.
-   * @return The {@link ResponseStatusProvider} with the {@link #REQUEST_BAD_RESPONSE} status-code.
-   * @since 2.3.4
+   * @return The {@link ResponseStatusProvider} with the {@link #REQUEST_UNAUTHORIZED_RESPONSE} status-code.
+   * @since 3.3.4
    */
-  public static <Model extends RequestableModel> ResponseStatusProvider<@Nullable Model> requestBadResponse() {
-    return new ResponseStatusProvider<>(REQUEST_BAD_RESPONSE, null);
+  public static <Model extends RequestableModel> ResponseStatusProvider<@Nullable Model> requestUnauthorizedResponse() {
+    return new ResponseStatusProvider<>(REQUEST_UNAUTHORIZED_RESPONSE, null);
   }
 
   /**
-   * Creates a new instance of {@link ResponseStatusProvider} with the {@link #REQUEST_UNKNOWN_RESPONSE}
+   * Creates a new instance of {@link ResponseStatusProvider} with the {@link #REQUEST_MOVED_PERMANENTLY_RESPONSE}
    * status-code, and a {@code null} model-type.
    *
    * @param <Model> an object which implements the {@link RequestableModel} interface.
-   * @return The {@link ResponseStatusProvider} with the {@link #REQUEST_UNKNOWN_RESPONSE} status-code.
-   * @since 2.3.4
+   * @return The {@link ResponseStatusProvider} with the {@link #REQUEST_MOVED_PERMANENTLY_RESPONSE} status-code.
+   * @since 3.3.4
    */
-  public static <Model extends RequestableModel> ResponseStatusProvider<@Nullable Model> requestUnknownResponse() {
-    return new ResponseStatusProvider<>(REQUEST_UNKNOWN_RESPONSE, null);
+  public static <Model extends RequestableModel> ResponseStatusProvider<@Nullable Model> requestMovedPermanentlyResponse() {
+    return new ResponseStatusProvider<>(REQUEST_MOVED_PERMANENTLY_RESPONSE, null);
+  }
+
+  /**
+   * Creates a new instance of {@link ResponseStatusProvider} with the {@link #REQUEST_FORBIDDEN_RESPONSE}
+   * status-code, and a {@code null} model-type.
+   *
+   * @param <Model> an object which implements the {@link RequestableModel} interface.
+   * @return The {@link ResponseStatusProvider} with the {@link #REQUEST_FORBIDDEN_RESPONSE} status-code.
+   * @since 3.3.4
+   */
+  public static <Model extends RequestableModel> ResponseStatusProvider<@Nullable Model> requestForbiddenResponse() {
+    return new ResponseStatusProvider<>(REQUEST_FORBIDDEN_RESPONSE, null);
   }
 
   /**
@@ -98,23 +112,33 @@ public record ResponseStatusProvider<Model>(byte status, @Nullable Model result)
   }
 
   /**
-   * Returns a boolean-state indicating if this provider's current status-code is {@link #REQUEST_BAD_RESPONSE}.
+   * Returns a boolean-state indicating if this provider's current status-code is {@link #REQUEST_UNAUTHORIZED_RESPONSE}.
    *
-   * @return Whether this provider's current status-code is {@link #REQUEST_BAD_RESPONSE}.
-   * @since 2.3.4
+   * @return Whether this provider's current status-code is {@link #REQUEST_UNAUTHORIZED_RESPONSE}.
+   * @since 3.3.4
    */
-  public boolean bad() {
-    return this.status == REQUEST_BAD_RESPONSE;
+  public boolean unauthorized() {
+    return this.status == REQUEST_UNAUTHORIZED_RESPONSE;
   }
 
   /**
-   * Returns a boolean-state indicating if this provider's current status-code is {@link #REQUEST_UNKNOWN_RESPONSE}.
+   * Returns a boolean-state indicating if this provider's current status-code is {@link #REQUEST_MOVED_PERMANENTLY_RESPONSE}.
    *
-   * @return Whether this provider's current status-code is {@link #REQUEST_UNKNOWN_RESPONSE}.
-   * @since 2.3.4
+   * @return Whether this provider's current status-code is {@link #REQUEST_MOVED_PERMANENTLY_RESPONSE}.
+   * @since 3.3.4
    */
-  public boolean unknown() {
-    return this.status == REQUEST_UNKNOWN_RESPONSE;
+  public boolean moved() {
+    return this.status == REQUEST_MOVED_PERMANENTLY_RESPONSE;
+  }
+
+  /**
+   * Returns a boolean-state indicating if this provider's current status-code is {@link #REQUEST_FORBIDDEN_RESPONSE}.
+   *
+   * @return Whether this provider's current status-code is {@link #REQUEST_FORBIDDEN_RESPONSE}.
+   * @since 3.3.4
+   */
+  public boolean forbidden() {
+    return this.status == REQUEST_FORBIDDEN_RESPONSE;
   }
 
   /**
