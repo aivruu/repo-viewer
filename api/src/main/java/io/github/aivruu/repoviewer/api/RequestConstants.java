@@ -22,10 +22,10 @@ package io.github.aivruu.repoviewer.api;
  * @since 2.3.4
  */
 public class RequestConstants {
-  /** The normal url used for common-users to access to GitHub. */
-  public static final String GITHUB_NORMAL_URL = "https://github.com/%s/%s";
   /** The url used for https-requests to GitHub's API. */
   public static final String GITHUB_API_URL = "https://api.github.com/repos/%s/%s";
+  /** The url used for http-requests to the release of the requested-repository. */
+  public static final String GITHUB_API_RELEASE_URL = GITHUB_API_URL + "/releases/tags/%s";
 
   private RequestConstants() {
     throw new UnsupportedOperationException("This class is for utility and cannot be instantiated.");
