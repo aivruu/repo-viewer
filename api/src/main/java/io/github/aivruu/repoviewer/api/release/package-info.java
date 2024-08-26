@@ -1,6 +1,5 @@
 /**
- * Provides record model for store the provided
- * release model.
+ * Provides release-model and builder, and enum for versions-comparing operations.
  *
  * @since 0.0.1
  */
