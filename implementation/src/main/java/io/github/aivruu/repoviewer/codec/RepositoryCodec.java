@@ -41,13 +41,13 @@ public enum RepositoryCodec implements JsonDeserializer<GithubRepositoryModel> {
   public GithubRepositoryModel deserialize(final JsonElement jsonElement, final Type type,
                                            final JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
     final var jsonObject = jsonElement.getAsJsonObject();
-    if (jsonObject.get("message") != null) { // Checks if the latest repository exists.
+    if (jsonObject.get("message") != null) { // Checks if the repository exists.
       return null;
     }
     final var repositoryOwner = jsonObject.get("owner").getAsJsonObject().get("login").getAsString();
     final var licenseNode = jsonObject.get("license");
     var license = "";
-    // Avoid failures during pre-testing due to non-detected or unavailable license on current repository.
+    // Avoid failures due to non-detected or unavailable license for the repository.
     if (licenseNode.isJsonNull()) {
       license = "unknown";
     } else {
