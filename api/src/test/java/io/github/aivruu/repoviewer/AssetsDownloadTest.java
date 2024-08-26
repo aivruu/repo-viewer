@@ -16,7 +16,7 @@
 //
 package io.github.aivruu.repoviewer;
 
-import io.github.aivruu.repoviewer.api.release.LatestReleaseModel;
+import io.github.aivruu.repoviewer.api.release.ReleaseModelBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,12 +26,17 @@ public class AssetsDownloadTest {
   @Test
   void downloadTest() {
     // We create a custom release-model for this test.
-    final var latestReleaseModel = new LatestReleaseModel("1.3.4",
-      new String[]{ "release-downloader-1.3.4.jar->https://github.com/aivruu/repo-viewer/releases/download/1.3.4/release-downloader-1.3.4.jar" });
+    final var repositoryReleaseModel = ReleaseModelBuilder.newBuilder()
+      .author("aivruu")
+      .tagName("1.3.4")
+      .releaseName("v1.3.4")
+      .uniqueId(12781293) // Random given id.
+      .assets(new String[]{ "release-downloader-1.3.4.jar->https://github.com/aivruu/repo-viewer/releases/download/1.3.4/release-downloader-1.3.4.jar" })
+      .build();
     final var destinationDirectory = new File("downloads");
     if (!destinationDirectory.exists()) destinationDirectory.mkdir();
 
-    final var fileDownloaded = latestReleaseModel.downloadFrom(destinationDirectory, 0).join();
-    Assertions.assertTrue(fileDownloaded.finished(), "The asset couldn't be downloaded.");
+    final var downloadStatusProvider = repositoryReleaseModel.downloadFrom(destinationDirectory, 0).join();
+    Assertions.assertTrue(downloadStatusProvider.finished(), "Download directory is invalid, possible path-injection?");
   }
 }
