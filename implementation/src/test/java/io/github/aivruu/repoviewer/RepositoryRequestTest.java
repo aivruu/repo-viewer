@@ -22,8 +22,9 @@ import org.junit.jupiter.api.Test;
 public class RepositoryRequestTest {
   @Test
   void repositoryRequest() {
-    final var repositoryHttpRequest = new RepositoryHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
-    System.out.println("Requesting repository from: " + repositoryHttpRequest.repository());
+    final var repositoryHttpRequest = new RepositoryHttpRequestModel(
+      RepositoryUrlBuilder.fromRepository("aivruu", "repo-viewer"));
+    System.out.println("Requesting repository from: " + repositoryHttpRequest.url());
     final var responseStatusProvider = repositoryHttpRequest.requestThen(10, repositoryModel ->
       System.out.println("Requested repository %s deserialized correctly".formatted(repositoryModel.name()))
     ).join();

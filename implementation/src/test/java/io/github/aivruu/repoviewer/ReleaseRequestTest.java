@@ -22,11 +22,12 @@ import org.junit.jupiter.api.Test;
 public class ReleaseRequestTest {
   @Test
   void releaseRequest() {
-    final var releaseHttpRequest = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
-    System.out.println("Requesting latest-release for repository: " + releaseHttpRequest.repository());
-    final var responseStatusProvider = releaseHttpRequest.requestThen(10, latestReleaseModel ->
+    final var releaseHttpRequest = new ReleaseHttpRequestModel(
+      RepositoryUrlBuilder.fromRelease("aivruu", "repo-viewer", "v2.3.4"));
+    System.out.println("Requesting latest-release for repository: " + releaseHttpRequest.url());
+    final var responseStatusProvider = releaseHttpRequest.requestThen(10, repositoryReleaseModel ->
       System.out.println("Requested repository's latest-release %s deserialized correctly: %s"
-        .formatted(latestReleaseModel.version(), latestReleaseModel.assets()[0]))
+        .formatted(repositoryReleaseModel.tagName(), repositoryReleaseModel.name()))
     ).join(); // Wait until future is complete and status-provider is got.
     Assertions.assertTrue(responseStatusProvider.valid(), "Failed to get release-model for this repository.");
   }
