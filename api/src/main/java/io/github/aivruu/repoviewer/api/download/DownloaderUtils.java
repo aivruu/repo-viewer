@@ -65,13 +65,7 @@ public final class DownloaderUtils {
    *     download.
    *     <p>
    *     - {@link DownloadStatusProvider#assetDownloadError()} if an error occurred during the downloading
-   *     process.
-   * @see DownloadStatusProvider#ASSET_DOWNLOAD_FINISHED
-   * @see DownloadStatusProvider#UNKNOWN_ASSET_TO_DOWNLOAD
-   * @see DownloadStatusProvider#UNEXISTING_ASSET_DEFAULT_SIZE
-   * @see DownloadStatusProvider#ASSET_DOWNLOAD_ERROR
-   * @see DownloadStatusProvider#INVALID_ASSET_DEFAULT_SIZE
-   * @since 2.3.4
+   * @since 3.3.4
    */
   public static DownloadStatusProvider fromUrlToFile(final File file, final String from) {
     // Using the provided URL we create a new URI object with this
@@ -84,11 +78,11 @@ public final class DownloaderUtils {
     // at the given position.
     try (final var readableByteChannel = Channels.newChannel(uriFromGiven.toURL().openStream());
          final var fileOutputStream = new FileOutputStream(file)) {
-      final var transferBytesReat = fileOutputStream.getChannel().transferFrom(readableByteChannel,
+      final var readBytesNumber = fileOutputStream.getChannel().transferFrom(readableByteChannel,
         /* The initial position for bytes transfer. */ 0, Long.MAX_VALUE);
-      return (transferBytesReat == 0)
+      return (readBytesNumber == 0)
         ? DownloadStatusProvider.unknownAssetToDownload()
-        : DownloadStatusProvider.assetDownloadFinished(transferBytesReat);
+        : DownloadStatusProvider.assetDownloadFinished(readBytesNumber);
     } catch (final IOException exception) {
       return DownloadStatusProvider.assetDownloadError();
     }
