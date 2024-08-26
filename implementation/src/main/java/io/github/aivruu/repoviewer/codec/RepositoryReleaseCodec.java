@@ -20,30 +20,32 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import io.github.aivruu.repoviewer.api.release.LatestReleaseModel;
+import io.github.aivruu.repoviewer.api.release.ReleaseModelBuilder;
+import io.github.aivruu.repoviewer.api.release.RepositoryReleaseModel;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
 /**
- * {@link JsonDeserializer} implementation used for manual deserialization with {@link LatestReleaseModel}s.
+ * {@link JsonDeserializer} implementation used for manual deserialization with {@link RepositoryReleaseModel}s.
  *
  * @since 0.0.1
  */
-public enum RepositoryReleaseCodec implements JsonDeserializer<LatestReleaseModel> {
+public enum RepositoryReleaseCodec implements JsonDeserializer<RepositoryReleaseModel> {
   /** Used for rapid-access to the enum's instance. */
   INSTANCE;
   /** Used to concatenate values from the {@code json} provided the requests responses. */
   public static final StringBuilder BUILDER = new StringBuilder();
 
   @Override
-  public @Nullable LatestReleaseModel deserialize(final JsonElement jsonElement, final Type type,
-                                                  final JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-    final var providedJsonObject = jsonElement.getAsJsonObject();
-    if (providedJsonObject.get("message") != null) { // Checks if the latest-release exists.
+  public @Nullable RepositoryReleaseModel deserialize(final JsonElement jsonElement, final Type type,
+                                                      final JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    final var jsonObject = jsonElement.getAsJsonObject();
+    if (jsonObject.get("message") != null) { // Checks if the release exists.
       return null;
     }
-    final var providedAssets = providedJsonObject.getAsJsonArray("assets").asList();
+    final var releaseAuthor = jsonObject.get("author").getAsJsonObject().get("login").getAsString();
+    final var providedAssets = jsonObject.getAsJsonArray("assets").asList();
     final var assetsArray = new String[providedAssets.size()];
     for (int i = 0; i < assetsArray.length; i++) {
       final var assetJsonObject = providedAssets.get(i).getAsJsonObject();
@@ -52,6 +54,12 @@ public enum RepositoryReleaseCodec implements JsonDeserializer<LatestReleaseMode
         .append(assetJsonObject.get("browser_download_url").getAsString())
         .toString();
     }
-    return new LatestReleaseModel(providedJsonObject.get("tag_name").getAsString(), assetsArray);
+    return ReleaseModelBuilder.newBuilder()
+      .author(releaseAuthor)
+      .tagName(jsonObject.get("tag_name").getAsString())
+      .releaseName(jsonObject.get("name").getAsString())
+      .uniqueId(jsonObject.get("id").getAsInt())
+      .assets(assetsArray)
+      .build();
   }
 }
