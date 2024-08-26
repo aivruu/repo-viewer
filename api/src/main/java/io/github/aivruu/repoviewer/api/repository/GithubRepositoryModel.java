@@ -16,7 +16,6 @@
 //
 package io.github.aivruu.repoviewer.api.repository;
 
-import io.github.aivruu.repoviewer.api.RequestConstants;
 import io.github.aivruu.repoviewer.api.http.request.RequestableModel;
 import io.github.aivruu.repoviewer.api.repository.attribute.RepositoryAttributes;
 
@@ -30,17 +29,7 @@ import io.github.aivruu.repoviewer.api.repository.attribute.RepositoryAttributes
  * @param license the license's identifier selected for this repository.
  * @param attributes a {@link RepositoryAttributes} which contains the most of the attributes
  *                   for this repository.
- * @since 0.0.1
+ * @since 3.3.4
  */
 public record GithubRepositoryModel(String owner, String name, String description, String license,
-                                    RepositoryAttributes attributes) implements RequestableModel {
-  @Override
-  public String urlForRequest() {
-    return RequestConstants.GITHUB_API_URL.formatted(this.owner, this.name);
-  }
-
-  @Override
-  public String browserUrlForRequest() {
-    return RequestConstants.GITHUB_NORMAL_URL.formatted(this.owner, this.name);
-  }
-}
+                                    RepositoryAttributes attributes) implements RequestableModel {}

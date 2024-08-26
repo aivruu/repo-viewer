@@ -23,20 +23,4 @@ import io.github.aivruu.repoviewer.api.http.GithubHttpRequestModel;
  *
  * @since 2.3.4
  */
-public interface RequestableModel {
-  /**
-   * Returns the url where the request is sent.
-   *
-   * @return The url for the request.
-   * @since 2.3.4
-   */
-  String urlForRequest();
-
-  /**
-   * Returns the url (for browsers) where the request is sent.
-   *
-   * @return The url for browsers where the request is sent.
-   * @since 2.3.4
-   */
-  String browserUrlForRequest();
-}
+public interface RequestableModel {}
