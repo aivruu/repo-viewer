@@ -20,12 +20,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.aivruu.repoviewer.api.codec.CodecProvider;
 import io.github.aivruu.repoviewer.api.http.request.RequestableModel;
-import io.github.aivruu.repoviewer.api.release.LatestReleaseModel;
+import io.github.aivruu.repoviewer.api.release.RepositoryReleaseModel;
 import io.github.aivruu.repoviewer.api.repository.GithubRepositoryModel;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * {@link CodecProvider} implementation for usage of codecs for {@link LatestReleaseModel}s and
+ * {@link CodecProvider} implementation for usage of codecs for {@link RepositoryReleaseModel}s and
  * {@link GithubRepositoryModel}s.
  *
  * @since 2.3.4
@@ -35,11 +35,11 @@ public enum CodecProviderImpl implements CodecProvider {
   INSTANCE;
 
   /**
-   * A {@link Gson} instance with defined-attributes for custom-codecs for {@link LatestReleaseModel}
+   * A {@link Gson} instance with defined-attributes for custom-codecs for {@link RepositoryReleaseModel}
    * and {@link GithubRepositoryModel} types for deserialization.
    */
   private static final Gson GSON_PROVIDER = new GsonBuilder()
-    .registerTypeAdapter(LatestReleaseModel.class, RepositoryReleaseCodec.INSTANCE)
+    .registerTypeAdapter(RepositoryReleaseModel.class, RepositoryReleaseCodec.INSTANCE)
     .registerTypeAdapter(GithubRepositoryModel.class, RepositoryCodec.INSTANCE)
     .create();
 
