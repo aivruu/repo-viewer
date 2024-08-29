@@ -12,12 +12,14 @@
 ## Features
 * View specified repository's information.
 * View each repository's releases' information.
+* Permits comparing between releases' defined tag-names.
 * Easy to usage.
 * Download assets from each repository release.
 
 ## Guides
 * [Download assets from any repository releases.](https://github.com/aivruu/repo-viewer/blob/main/docs/download-assets-guide.md)
 * [Make a request to an specified repository.](https://github.com/aivruu/repo-viewer/blob/main/docs/make-request-guide.md)
+* [Compare a release's tag-name with another.](https://github.com/aivruu/repo-viewer/blob/main/docs/version-comparing-guide.md)
 
 ## Download
 ```kotlin
@@ -36,5 +38,5 @@ This project require Gradle for building and management, and Java 21 as minimum.
 ```
 git clone https://github.com/aivruu/repo-viewer.git
 cd repo-viewer
-./gradlew build
+./gradlew shadowJar
 ```
