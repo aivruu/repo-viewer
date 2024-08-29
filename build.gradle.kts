@@ -38,6 +38,7 @@ subprojects {
   }
 
   dependencies {
+    implementation("org.jetbrains:annotations:24.0.1")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.1")
   }
 
@@ -47,24 +48,20 @@ subprojects {
       options.compilerArgs.add("-parameters")
     }
     shadowJar {
-      archiveFileName.set(rootProject.name)
+      archiveBaseName.set(project.name)
       minimize()
 
       // Package expected to use as final directory for dependencies used.
       val relocationFinalPackage = "io.github.aivruu.repoviewer.libs"
 
       relocate("org.jetbrains.annotations", "$relocationFinalPackage.org.jetbrains.annotations")
-      relocate("com.google.gson", "$relocationFinalPackage.com.google.gson")
+      relocate("com.google", "$relocationFinalPackage.com.google")
     }
   }
 
   publishing {
     publications {
       create<MavenPublication>("maven") {
-        groupId = "io.github.aivruu.repoviewer"
-        artifactId = project.name
-        version = project.version.toString()
-
         from(components["java"])
       }
     }
