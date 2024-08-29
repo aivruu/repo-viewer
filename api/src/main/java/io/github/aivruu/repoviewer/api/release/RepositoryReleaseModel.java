@@ -117,7 +117,7 @@ public record RepositoryReleaseModel(String author, String tagName, String name,
    *
    * @param comparingOperator the operator-type to use for this comparing.
    * @param targetVersion the version to compare.
-   * @return A boolean-state indicating if the version-comparing for the specified operator-tyé returned true,
+   * @return A boolean-state indicating if the version-comparing for the specified operator-type returned true,
    *     otherwise false.
    * @since 3.4.4
    */
@@ -128,11 +128,11 @@ public record RepositoryReleaseModel(String author, String tagName, String name,
     final var versionStringToNumber = Integer.parseInt(versionWithoutDots.startsWith("v")
       ? versionWithoutDots.substring(1) : versionWithoutDots);
     return switch (comparingOperator) {
-      case EQUAL -> versionStringToNumber == targetVersion;
-      case LESS -> versionStringToNumber < targetVersion;
-      case LESS_OR_EQUAL -> versionStringToNumber <= targetVersion;
-      case GREATER -> versionStringToNumber > targetVersion;
-      case GREATER_OR_EQUAL -> versionStringToNumber >= targetVersion;
+      case EQUAL -> targetVersion == versionStringToNumber;
+      case LESS -> targetVersion < versionStringToNumber;
+      case LESS_OR_EQUAL -> targetVersion <= versionStringToNumber;
+      case GREATER -> targetVersion > versionStringToNumber;
+      case GREATER_OR_EQUAL -> targetVersion >= versionStringToNumber;
       // Should not happen never, but we define it to avoid syntax errors.
       default -> false;
     };
