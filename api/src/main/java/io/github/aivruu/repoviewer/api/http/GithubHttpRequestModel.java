@@ -27,9 +27,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
- * This base-model for another request-implementations such as for releases or repositories.
+ * This interface is used for provide functions to work with requests to the GitHub API.
  *
- * @param <Model> The model-type to use for this request.
+ * @param <Model> The model-type to use for the request.
  * @since 3.3.4
  */
 public interface GithubHttpRequestModel<Model extends RequestableModel> {
