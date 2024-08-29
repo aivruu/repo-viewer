@@ -18,7 +18,7 @@ package io.github.aivruu.repoviewer.api.release;
 
 /**
  * This enum is used to specify what operator-type would be used for comparing operations
- * at {@link RepositoryReleaseModel#compareVersion(VersionComparingOperators, int)}.
+ * at {@link RepositoryReleaseModel#compareVersionFromNumber(VersionComparingOperators, int)}.
  *
  * @since 3.3.4
  */
