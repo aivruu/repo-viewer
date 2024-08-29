@@ -112,19 +112,21 @@ public record RepositoryReleaseModel(String author, String tagName, String name,
   }
 
   /**
-   * Realizes a comparing using the specified {@link VersionComparingOperators} type and the given target-version.
+   * Compares the current version for this release-model, with the given version, using the specified operator-type
+   * for comparing process.
    *
    * @param comparingOperator the operator-type to use for this comparing.
    * @param targetVersion the version to compare.
-   * @return A boolean-state indicating if the comparing for the specified operator returned true, otherwise false.
-   * @since 3.3.4
+   * @return A boolean-state indicating if the version-comparing for the specified operator-tyé returned true,
+   *     otherwise false.
+   * @since 3.4.4
    */
-  public boolean compareVersion(final VersionComparingOperators comparingOperator, final int targetVersion) {
+  public boolean compareVersionFromNumber(final VersionComparingOperators comparingOperator, final int targetVersion) {
     // e.g. v2.10.1 -> v2101 -> 2101
     // or 1.3.4 -> 134
-    final var versionStringToNumber = Integer.parseInt(this.tagName.replace(".", "").startsWith("v")
-      ? this.tagName.substring(1)
-      : this.tagName);
+    final var versionWithoutDots = this.tagName.replace(".", "");
+    final var versionStringToNumber = Integer.parseInt(versionWithoutDots.startsWith("v")
+      ? versionWithoutDots.substring(1) : versionWithoutDots);
     return switch (comparingOperator) {
       case EQUAL -> versionStringToNumber == targetVersion;
       case LESS -> versionStringToNumber < targetVersion;
@@ -134,5 +136,26 @@ public record RepositoryReleaseModel(String author, String tagName, String name,
       // Should not happen never, but we define it to avoid syntax errors.
       default -> false;
     };
+  }
+
+  /**
+   * Realizes a comparing for this release-model's current version using the specified {@link VersionComparingOperators}
+   * type, and the given version is parsed into a {@code int} for internal comparing at
+   * {@link #compareVersionFromNumber(VersionComparingOperators, int)}.
+   *
+   * @param comparingOperators the operator-type to use for this comparing.
+   * @param targetVersion the version to compare.
+   * @return A boolean-state indicating if the version-comparing for the specified operator-type returned true,
+   *     otherwise false.
+   * @see #compareVersionFromNumber(VersionComparingOperators, int)
+   * @since 3.4.4
+   */
+  public boolean compareVersionFromString(final VersionComparingOperators comparingOperators, String targetVersion) {
+    // e.g. v2.10.1 -> v2101 -> 2101
+    // or 1.3.4 -> 134
+    targetVersion = targetVersion.replace(".", "");
+    final var targetVersionToNumber = Integer.parseInt(targetVersion.startsWith("v")
+      ? targetVersion.substring(1) : targetVersion);
+    return this.compareVersionFromNumber(comparingOperators, targetVersionToNumber);
   }
 }
