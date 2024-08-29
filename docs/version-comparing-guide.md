@@ -13,8 +13,11 @@ the release-model's tag-name, which will be parsed into a number before comparin
 
 ```java
 // Comparing using a version-number.
+// This will verify if the given version-number, is higher (newer) than this release's current tag/version.
 repositoryReleaseModel.compareVersionWithNumber(VersionComparingOperators.GREATER, 354);
 
-// Comparing using a version-string.
+// Comparing using a version-string, same usage that with upper function.
+// "v3.5.4" will verify if it is higher (newer) than the release's tag/version.
 repositoryReleaseModel.compareVersionWithString(VersionComparingOperators.GREATER, "v3.5.4");
+repositoryReleaseModel.compareVersionWithString(VersionComparingOperators.GREATER, anotherReleaseModel.tagName());
 ```
