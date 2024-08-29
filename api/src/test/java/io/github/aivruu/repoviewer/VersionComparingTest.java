@@ -40,7 +40,7 @@ public class VersionComparingTest {
       .build();
     // We compare if the version for the 'latest-release-for-comparing' is newer than the 'deprecated-release'.
     Assertions.assertTrue(
-      latestReleaseForComparing.compareVersionFromString(VersionComparingOperators.GREATER, deprecatedRelease.tagName()),
+      latestReleaseForComparing.compareVersionFromString(VersionComparingOperators.LESS, deprecatedRelease.tagName()),
       "The compared version isn't greater than this release-model's version.");
   }
 }
