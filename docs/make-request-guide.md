@@ -1,4 +1,4 @@
-# How to make a request to a Repository, or get their Latest Release
+# How to make a request to a Repository, or get a specific-release
 For this, we have the [GithubHttpRequestModel](https://github.com/aivruu/repo-viewer/blob/recode/api/src/main/java/io/github/aivruu/repoviewer/api/http/GithubHttpRequestModel.java)
 interface, which is used as main-model for another implementations responsable of handling the requests made to the specified GitHub repository,
 and the latest-release for that repository. You can create your own implementation for make custom-requests to the API.
