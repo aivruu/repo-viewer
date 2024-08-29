@@ -8,7 +8,7 @@ for the request, which can be a `GithubRepositoryModel` or `LatestReleaseModel`,
 will be executed only if a response was provided and the json-body was deserialized into respective model, otherwise, if due to some reason a `null-value` was returned, the consumer will be ignored. The functions that have ___Using___ will require a configured http-client that will be used to perform the requests to the specified repository/release. All these functions also will require an `int-type` parameter which is the max-timeout for every made http-request.
 
 These functions will return a `CompletableFuture<ResponseStatusProvider<Model>>`, where the model returned by the status-provider could be null, the
-[ResponseStatusProvider](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/api/http/status/ResponseStatusProvider.java) have 4 possible status to provide, also, giving methods for new status-provider instances creation, or status-code type verification.
+[ResponseStatusProvider](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/api/http/status/ResponseStatusProvider.java) have 5 possible status to provide (2 for repositories, one for requests), also, giving methods for new status-provider instances creation, or status-code type verification.
 
 This interface have two implementations, [ReleaseHttpRequestModel](https://github.com/aivruu/repo-viewer/blob/recode/implementation/src/main/java/io.github.aivruu.repoviewer/ReleaseHttpRequestModel.java)
 used for repository's latest-release request, this implementation will return a `CompletableFuture<ResponseStatusProvider<LatestReleaseModel>>`. [RepositoryHttpRequestModel](https://github.com/aivruu/repo-viewer/blob/recode/implementation/src/main/java/io.github.aivruu.repoviewer/RepositoryHttpRequestModel.java)
@@ -39,8 +39,8 @@ final var releaseHttpRequestModel = new ReleaseHttpRequestModel(RepositoryUrlBui
 releaseHttpRequest.requestUsing(customHttpClient, 5) // Timeout will be 5 seconds.
   .thenAccept(responseStatusProvider -> {
     // The deserialized-model could be null, so we need to check first.
-    if (!responseStatusProvider.valid()) {
-      System.out.println("Release-model wasn't provided.");
+    if (!responseStatusProvider.unauthorized()) {
+      System.out.println("Request's response from the API is: 401 - Unauthorized.");
       return;
     }
 
@@ -55,7 +55,7 @@ with the `json-body` from that response.
 final var releaseHttpRequestModel = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
 releaseHttpRequest.requestThen(/** Timeout will be 5 seconds. */ 5, latestReleaseModel ->
   System.out.println("Viewing latest-release with version: " + latestReleaseModel.version())).thenAccept(responseStatusProvider -> {
-    if (!responseStatusProvider.unknown()) System.out.println("Unknown repository requested, so release-model wasn't provided.");
+    if (responseStatusProvider.moved()) System.out.println("Probably requested repository was moved.");
   });
 ```
 Example with a configured http-client:
@@ -66,8 +66,8 @@ final var customHttpClient = HttpClient.newBuilder()
 final var releaseHttpRequestModel = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
 releaseHttpRequest.requestUsingThen(customHttpClient, /** Timeout will be 5 seconds. */ 5, latestReleaseModel -> cache.put("release-http-request", latestReleaseModel))
   .thenAccept(responseStatusProvider -> {
-    if (!responseStatusProvider.invalid()) {
-      System.out.println("The http-request's response wasn't provided.");
+    if (!responseStatusProvider.forbidden()) {
+      System.out.println("Request's response from the API is: 403 - Forbidden.");
       return;
     }
     System.out.println("Repository's latest-release with version: " + latestReleaseModel.version());
