@@ -66,7 +66,7 @@ public enum RepositoryCodec implements JsonDeserializer<GithubRepositoryModel> {
     final var forked = jsonObject.get("fork").getAsBoolean();
     // If this repository is a fork of another repository, we need to
     // get the name of the owner of the original repository.
-    final var repositoryParent = isForked
+    final var repositoryParent = forked
       ? jsonObject.get("parent").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString()
       : null;
     final var providedTopicsArray = jsonObject.get("topics").getAsJsonArray();
