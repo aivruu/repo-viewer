@@ -63,7 +63,7 @@ public enum RepositoryCodec implements JsonDeserializer<GithubRepositoryModel> {
   }
 
   private RepositoryAttributes createAttributesContainer(final JsonObject jsonObject) {
-    final var isForked = jsonObject.get("fork").getAsBoolean();
+    final var forked = jsonObject.get("fork").getAsBoolean();
     // If this repository is a fork of another repository, we need to
     // get the name of the owner of the original repository.
     final var repositoryParent = isForked
@@ -78,7 +78,7 @@ public enum RepositoryCodec implements JsonDeserializer<GithubRepositoryModel> {
       .canBeForked(jsonObject.get("allow_forking").getAsBoolean())
       .stars(jsonObject.get("stargazers_count").getAsInt())
       .forksAmount(jsonObject.get("forks_count").getAsInt())
-      .fork(jsonObject.get("fork").getAsBoolean())
+      .fork(forked)
       .parent(repositoryParent)
       .visible(jsonObject.get("private").getAsBoolean())
       .archived(jsonObject.get("archived").getAsBoolean())
