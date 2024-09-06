@@ -47,6 +47,8 @@ public enum RepositoryReleaseCodec implements JsonDeserializer<RepositoryRelease
     final var releaseAuthor = jsonObject.get("author").getAsJsonObject().get("login").getAsString();
     final var providedAssets = jsonObject.getAsJsonArray("assets").asList();
     final var assetsArray = new String[providedAssets.size()];
+    // Reset string-builder's content in case that another request was made previously.
+    BUILDER.setLength(0);
     for (int i = 0; i < assetsArray.length; i++) {
       final var assetJsonObject = providedAssets.get(i).getAsJsonObject();
       assetsArray[i] = BUILDER.append(assetJsonObject.get("name").getAsString())
