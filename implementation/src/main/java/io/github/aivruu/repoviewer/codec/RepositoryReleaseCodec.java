@@ -35,7 +35,7 @@ public enum RepositoryReleaseCodec implements JsonDeserializer<RepositoryRelease
   /** Used for rapid-access to the enum's instance. */
   INSTANCE;
   /** Used to concatenate values from the {@code json} provided the requests responses. */
-  public static final StringBuilder BUILDER = new StringBuilder();
+  private static final StringBuilder BUILDER = new StringBuilder();
 
   @Override
   public @Nullable RepositoryReleaseModel deserialize(final JsonElement jsonElement, final Type type,
