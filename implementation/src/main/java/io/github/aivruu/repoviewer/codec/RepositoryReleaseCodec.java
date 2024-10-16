@@ -20,7 +20,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import io.github.aivruu.repoviewer.api.release.ReleaseModelBuilder;
 import io.github.aivruu.repoviewer.api.release.RepositoryReleaseModel;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,12 +55,7 @@ public enum RepositoryReleaseCodec implements JsonDeserializer<RepositoryRelease
         .append(assetJsonObject.get("browser_download_url").getAsString())
         .toString();
     }
-    return ReleaseModelBuilder.newBuilder()
-      .author(releaseAuthor)
-      .tagName(jsonObject.get("tag_name").getAsString())
-      .releaseName(jsonObject.get("name").getAsString())
-      .uniqueId(jsonObject.get("id").getAsInt())
-      .assets(assetsArray)
-      .build();
+    return new RepositoryReleaseModel(releaseAuthor, jsonObject.get("tag_name").getAsString(),
+      jsonObject.get("name").getAsString(), jsonObject.get("id").getAsInt(), assetsArray);
   }
 }

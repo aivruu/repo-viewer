@@ -22,7 +22,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.github.aivruu.repoviewer.api.repository.GithubRepositoryModel;
-import io.github.aivruu.repoviewer.api.repository.RepositoryModelBuilder;
 import io.github.aivruu.repoviewer.api.repository.attribute.RepositoryAttributes;
 import io.github.aivruu.repoviewer.api.repository.attribute.RepositoryAttributesBuilder;
 
@@ -53,13 +52,8 @@ public enum RepositoryCodec implements JsonDeserializer<GithubRepositoryModel> {
     } else {
       license = licenseNode.getAsJsonObject().get("name").getAsString();
     }
-    return RepositoryModelBuilder.newBuilder()
-      .owner(repositoryOwner)
-      .name(jsonObject.get("name").getAsString())
-      .description(jsonObject.get("description").getAsString())
-      .license(license)
-      .attributes(this.createAttributesContainer(jsonObject))
-      .build();
+    return new GithubRepositoryModel(repositoryOwner, jsonObject.get("name").getAsString(),
+      jsonObject.get("description").getAsString(), license, this.createAttributesContainer(jsonObject));
   }
 
   private RepositoryAttributes createAttributesContainer(final JsonObject jsonObject) {
