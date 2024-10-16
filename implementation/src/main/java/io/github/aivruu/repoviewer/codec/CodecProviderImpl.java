@@ -24,6 +24,8 @@ import io.github.aivruu.repoviewer.api.release.RepositoryReleaseModel;
 import io.github.aivruu.repoviewer.api.repository.GithubRepositoryModel;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Type;
+
 /**
  * {@link CodecProvider} implementation for usage of codecs for {@link RepositoryReleaseModel}s and
  * {@link GithubRepositoryModel}s.
@@ -43,17 +45,8 @@ public enum CodecProviderImpl implements CodecProvider {
     .registerTypeAdapter(GithubRepositoryModel.class, RepositoryCodec.INSTANCE)
     .create();
 
-  /**
-   * Deserializes the {@code json} given into a specified-type {@link RequestableModel}.
-   *
-   * @param modelType the model-type to create since the given json.
-   * @param json the json to deserialize into a new model.
-   * @param <Model> the model-type specified that must be a {@link RequestableModel} implementation.
-   * @return The deserialized model, or {@code null} if something went wrong, or there's nothing
-   *     to deserialize.
-   * @since 2.3.4
-   */
-  public <Model extends RequestableModel> @Nullable Model from(final Class<Model> modelType, final String json) {
-    return GSON_PROVIDER.fromJson(json, modelType);
+  @Override
+  public <Model extends RequestableModel> @Nullable Model from(final Type type, final String json) {
+    return GSON_PROVIDER.fromJson(json, type);
   }
 }
