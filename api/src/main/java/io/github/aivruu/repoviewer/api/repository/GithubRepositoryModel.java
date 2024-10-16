@@ -31,5 +31,6 @@ import io.github.aivruu.repoviewer.api.repository.attribute.RepositoryAttributes
  *                   for this repository.
  * @since 3.3.4
  */
-public record GithubRepositoryModel(String owner, String name, String description, String license,
-                                    RepositoryAttributes attributes) implements RequestableModel {}
+public record GithubRepositoryModel(
+  String owner, String name, String description, String license, RepositoryAttributes attributes
+) implements RequestableModel {}
