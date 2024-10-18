@@ -121,7 +121,7 @@ public record RepositoryReleaseModel(String author, String tagName, String name,
    *     otherwise false.
    * @since 3.4.4
    */
-  public boolean compareVersionFromNumber(final VersionComparingOperators comparingOperator, final int targetVersion) {
+  public boolean compareVersionFromNumber(final VersionComparingOperatorEnum comparingOperator, final int targetVersion) {
     // e.g. v2.10.1 -> v2101 -> 2101
     // or 1.3.4 -> 134
     final var versionWithoutDots = this.tagName.replace(".", "");
@@ -139,18 +139,18 @@ public record RepositoryReleaseModel(String author, String tagName, String name,
   }
 
   /**
-   * Realizes a comparing for this release-model's current version using the specified {@link VersionComparingOperators}
+   * Realizes a comparing for this release-model's current version using the specified {@link VersionComparingOperatorEnum}
    * type, and the given version is parsed into a {@code int} for internal comparing at
-   * {@link #compareVersionFromNumber(VersionComparingOperators, int)}.
+   * {@link #compareVersionFromNumber(VersionComparingOperatorEnum, int)}.
    *
    * @param comparingOperators the operator-type to use for this comparing.
    * @param targetVersion the version to compare.
    * @return A boolean-state indicating if the version-comparing for the specified operator-type returned true,
    *     otherwise false.
-   * @see #compareVersionFromNumber(VersionComparingOperators, int)
+   * @see #compareVersionFromNumber(VersionComparingOperatorEnum, int)
    * @since 3.4.4
    */
-  public boolean compareVersionFromString(final VersionComparingOperators comparingOperators, String targetVersion) {
+  public boolean compareVersionFromString(final VersionComparingOperatorEnum comparingOperators, String targetVersion) {
     // e.g. v2.10.1 -> v2101 -> 2101
     // or 1.3.4 -> 134
     targetVersion = targetVersion.replace(".", "");
