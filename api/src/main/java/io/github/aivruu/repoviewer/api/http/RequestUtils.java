@@ -40,7 +40,7 @@ import java.util.function.Consumer;
  */
 public class RequestUtils {
   /** Four fixed-thread-pool used for http-requests operations. */
-  private static ExecutorService EXECUTOR = Executors.newFixedThreadPool(4,
+  private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(4,
     r -> new Thread(r, "HttpRequest-Thread"));
 
   /**
