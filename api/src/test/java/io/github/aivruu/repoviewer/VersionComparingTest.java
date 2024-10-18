@@ -16,31 +16,21 @@
 //
 package io.github.aivruu.repoviewer;
 
-import io.github.aivruu.repoviewer.api.release.ReleaseModelBuilder;
-import io.github.aivruu.repoviewer.api.release.VersionComparingOperators;
+import io.github.aivruu.repoviewer.api.release.RepositoryReleaseModel;
+import io.github.aivruu.repoviewer.api.release.VersionComparingOperatorEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class VersionComparingTest {
   @Test
   void comparingTest() {
-    final var deprecatedRelease = ReleaseModelBuilder.newBuilder()
-      .author("aivruu")
-      .tagName("v2.3.4")
-      .releaseName("v2.3.4 - Full Recode and Improvements")
-      .uniqueId(10_230_123 /* Random release-id. */)
-      .assets(new String[]{})
-      .build();
-    final var latestReleaseForComparing = ReleaseModelBuilder.newBuilder()
-      .author("aivruu")
-      .tagName("v3.3.4")
-      .releaseName("v3.3.4 - Improvements and Features")
-      .uniqueId(49_032_123 /* Random release-id. */)
-      .assets(new String[]{})
-      .build();
+    final var deprecatedRelease = new RepositoryReleaseModel("aivruu", "v2.3.4", "v2.3.4 - Full Recode and Improvements",
+      10_230_123, new String[]{});
+    final var latestRelease = new RepositoryReleaseModel("aivruu", "v3.3.4", "v3.3.4 - Improvements and Features",
+      49_032_123, new String[]{});
     // We compare if the version for the 'latest-release-for-comparing' is newer than the 'deprecated-release'.
     Assertions.assertTrue(
-      latestReleaseForComparing.compareVersionFromString(VersionComparingOperators.LESS, deprecatedRelease.tagName()),
+      latestRelease.compareVersionFromString(VersionComparingOperatorEnum.LESS, deprecatedRelease.tagName()),
       "The compared version isn't greater than this release-model's version.");
   }
 }
