@@ -19,8 +19,6 @@ package io.github.aivruu.repoviewer.api.codec;
 import io.github.aivruu.repoviewer.api.http.request.RequestableModel;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Type;
-
 /**
  * This class is used for the deserialization handling of {@link RequestableModel}s.
  *
@@ -37,5 +35,5 @@ public interface CodecProvider {
    *     to deserialize.
    * @since 2.3.4
    */
-  <Model extends RequestableModel> @Nullable Model from(final Type type, final String json);
+  <Model extends RequestableModel> @Nullable Model from(final Class<Model> type, final String json);
 }
