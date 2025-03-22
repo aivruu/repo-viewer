@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2024 Aivruu - repo-viewer
+// Copyright (C) 2024-2025 aivruu - repo-viewer
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,10 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
-package io.github.aivruu.repoviewer.api.repository.attribute;
+package io.github.aivruu.repoviewer.repository.domain;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public record RepositoryAttributes(
-  boolean isForked, @Nullable String parent, boolean canBeForked, int stars, int forks, boolean isPublic,
-  boolean isArchived, boolean isDisabled, @Nullable String language, @Nullable String[] topics) {}
+/**
+ * Represents a published-repository in GitHub.
+ *
+ * @param owner the repository's owner.
+ * @param name the repository's name.
+ * @param description the repository's description.
+ * @param license the repository's license, {@code null} if it don't have one.
+ * @param properties the repository's properties.
+ * @since 4.0.0
+ */
+public record RepositoryValueObject(
+  @NotNull String owner, @NotNull String name, @NotNull String description,
+  @Nullable String license, @NotNull RepositoryPropertiesValueObject properties
+) {}
