@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2024 Aivruu - repo-viewer
+// Copyright (C) 2024-2025 aivruu - repo-viewer
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,19 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
-package io.github.aivruu.repoviewer.api.release;
+package io.github.aivruu.repoviewer.release.domain.compare;
 
 /**
- * This enum is used to specify what operator-type would be used for comparing operations
- * at {@link RepositoryReleaseModel#compareVersionFromNumber(VersionComparingOperatorEnum, int)}.
+ * Represents the operators that can be used for between-versions comparison.
  *
- * @since 3.3.4
+ * @since 4.0.0
  */
-public enum VersionComparingOperatorEnum {
+public enum ComparisonOperator {
   /** Uses the equality operator. */
-  EQUAL,
+  EQUALITY,
   /** Uses the inequality operator. */
-  DIFFERENT,
+  DISTINCTION,
   /** Uses the less-than operator. */
   LESS,
   /** Uses the less-than or equal operator. */
