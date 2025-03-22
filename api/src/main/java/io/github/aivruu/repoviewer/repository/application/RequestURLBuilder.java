@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2024 Aivruu - repo-viewer
+// Copyright (C) 2024-2025 aivruu - repo-viewer
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,17 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
-package io.github.aivruu.repoviewer;
+package io.github.aivruu.repoviewer.repository.application;
 
-import io.github.aivruu.repoviewer.api.RequestConstants;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This class is used to create formatted GitHub's API usable URLs.
  *
- * @since 0.0.1
+ * @since 4.0.0
  */
-public final class RepositoryUrlBuilder {
-  private RepositoryUrlBuilder() {
+public final class RequestURLBuilder {
+  /** The url used for https-requests to GitHub's API. */
+  public static final String GITHUB_API_URL = "https://api.github.com/repos/%s/%s";
+  /** The url used for http-requests to the release of the requested-repository. */
+  public static final String GITHUB_API_RELEASE_URL = GITHUB_API_URL + "/releases/tags/%s";
+
+  private RequestURLBuilder() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
 
@@ -37,8 +42,8 @@ public final class RepositoryUrlBuilder {
    * @return A URL formatted for HTTPS requests to GitHub API.
    * @since 3.3.4
    */
-  public static String fromRepository(final String user, final String repository) {
-    return RequestConstants.GITHUB_API_URL.formatted(user, repository);
+  public static @NotNull String forRepository(final @NotNull String user, final @NotNull String repository) {
+    return GITHUB_API_URL.formatted(user, repository);
   }
 
   /**
@@ -51,7 +56,13 @@ public final class RepositoryUrlBuilder {
    * @return A URL formatted for http-requests to that repository's release.
    * @since 3.3.4
    */
-  public static String fromRelease(final String user, final String repository, final String release) {
-    return RequestConstants.GITHUB_API_RELEASE_URL.formatted(user, repository, release);
+  public static @NotNull String forRelease(
+    final @NotNull String user, final @NotNull String repository, final @NotNull String release
+  ) {
+    var apiUrl = GITHUB_API_RELEASE_URL.formatted(user, repository, release);
+    if (release.equals("latest")) {
+      apiUrl = apiUrl.replace("tags/", "");
+    }
+    return apiUrl;
   }
 }
