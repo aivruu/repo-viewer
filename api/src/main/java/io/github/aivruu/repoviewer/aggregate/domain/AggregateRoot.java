@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2024 Aivruu - repo-viewer
+// Copyright (C) 2024-2025 aivruu - repo-viewer
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,13 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
-package io.github.aivruu.repoviewer.api.http.request;
+package io.github.aivruu.repoviewer.aggregate.domain;
 
-import io.github.aivruu.repoviewer.api.http.GithubHttpRequestModel;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * This interface is used to mark models which can be used for {@link GithubHttpRequestModel}s.
+ * Represents an aggregate-root model.
  *
- * @since 2.3.4
+ * @since 4.0.0
  */
-public interface RequestableModel {}
+public abstract class AggregateRoot {
+  private final String id;
+
+  protected AggregateRoot(final @NotNull String id) {
+    this.id = id;
+  }
+
+  /**
+   * Returns the aggregate-root's id.
+   *
+   * @return The identifier.
+   * @since 4.0.0
+   */
+  public final @NotNull String id() {
+    return this.id;
+  }
+}
