@@ -1,32 +1,37 @@
 # How to download assets from the requested repository's specified-release
-A [LatestReleaseModel](https://github.com/aivruu/repo-viewer/blob/recode/api/src/main/java/io/github/aivruu/repoviewer/api/release/LatestReleaseModel.java) have the possibility of download one, or all the assets adjunted by the developer at the current latest-release, at a pre-defined directory.
+The API provides two services for download-purposes, the DownloaderService & AssetDownloaderService, the first provides a singleton-method
+for get a global-instance of it, the second requires an instance of DownloaderService to work, and needs to be initialized.
 
-This model provide two methods, `downloadFrom(File, int)` & `downloadAll(File)`. Both functions requires a `File` object which represent the directory
-where the asset, or assets will be downloaded. The first method require an `int-value` which is the asset's position at the assets-array to be downloaded, and will return a `DownloadStatusProvider`. The second only require the destination-directory for downloaded-files, and will return the number of assets downloaded.
+It should be said that the DownloaderService uses a custom thread-pool for the download-operations (which is provided by `ExecutorHelper`),
+this thread-pool should be initialized prior to perform any download-operation, as well for the requests if you're going to
+use the `AbstractRequest#DEFAULT_CLIENT`, which uses the same thread-pool too.
 
-This functions internally uses the class [DownloaderUtils](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/api/download/DownloaderUtils.java) for this processes, and provides a [DownloadStatusProvider](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/api/download/status/DownloadStatusProvider.java) which contains the current status-code and result (that are the read-bytes number) for the download operation:
+```java
+// We create a fixed-sized pool of 4 threads, it can throw an exception if the pool is already initialized.
+ExecutorHelper.build(4);
+// We get the executor for the download-operations, it can throw an exception if the pool is not initialized.
+final var executor = ExecutorHelper.get();
+```
+```java
+private final AssetDownloaderService assetDownloaderService = new AssetDownloaderService(DownloaderService.get());
+```
+
+For assets-download purposes, is required to use the AssetDownloaderService, this class provides a method `download(String[], File, int)`, which its parameters
+are `String[] -> Assets | File -> Destination | int -> Asset-Index`. The class uses the `DownloaderService` internally for this purpose, and proportionate
+additional handling logic for assets-access and parameters-providing.
 
 ```java
 // ...
-if (latestReleaseModel == null) return;
-final var downloadedFileDirectory = new File("downloads");
-if (!downloadedFileDirectory.exists()) downloadedFileDirectory.mkdir();
-
-latestReleaseModel.downloadFrom(downloadedFileDirectory, 0).thenAccept(downloadStatusProvider -> {
-  if (downloadStatusProvider.finished()) System.out.println("File downloaded"); 
-});
+final var destination = new File("downloads");
+if (!destination.exists() && !destination.mkdir()) {
+  return;
+}
+final var downloadStatus = this.assetDownloaderService.download(releaseAggregateRoot.assets(), destination, 1);
+if (!downloadStatus.wasDownloaded()) {
+  return;
+}
+this.logger.info("The file has been downloaded successfully!");
 // ...
 ```
-An example downloading a single file into an expected directory.
-```java
-// ...
-if (latestReleaseModel == null) return;
-final var filesDirectory = new File("downloads");
-if (!filesDirectory.exists()) filesDirectory.mkdir();
 
-latestReleaseModel.downloadAll(downloadedFileDirectory).thenAccept(assetsAmount -> {
-  if (assetsAmount >= 1) System.out.println("Files downloaded");
-  else System.out.println("No files downloaded.");
-});
-// ...
-```
+

@@ -1,23 +1,15 @@
 # How to compare a release's tag-name/version with another
-The [RepositoryReleaseModel](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/api/release/RepositoryReleaseModel.java)
-implements functions to permit releases' tags comparing using specific operator-types for this tasks, this types are provided
-by the [VersionComparingOperators](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/api/release/VersionComparingOperators.java)
-enum.
 
-There're two functions with the same-proposite, but requirements different.
+For this, the ReleaseValueObject provides a few methods (which are accessible from its aggregate-root) to compare the
+current release's tag-name with another, using an specific operator-type for the comparison, check ComparisonOperator.
 
-The `compareVersionWithNumber(VersionComparingOperators, int)` will compare the release-model's
-version with the given version-number using the specified operator-type **(EQUAL, LESS, GREATER)**, returning a `boolean-value` indicating comparing-function's final result.
-By another way, The `compareVersionWithString(VersionComparingOperators, String)` perform the same logic using the version-string given for the comparing, normally this string will be
-the release-model's tag-name, which will be parsed into a number before comparing-process.
+The `compareVersionNumber(ComparisonOperator, int)` will compare the release's tag with the given version-number using
+the defined operator-type for the comparison, and will return a `boolean` result for comparing-function's completion.
+
+The method `compareVersionString(ComparisonOperator, String)` will execute the same logic, with the difference that the
+provided version-string will be parsed into a numeric to proceed with the comparison.
 
 ```java
-// Comparing using a version-number.
-// This will verify if the given version-number, is higher (newer) than this release's current tag/version.
-repositoryReleaseModel.compareVersionWithNumber(VersionComparingOperators.GREATER, 354);
-
-// Comparing using a version-string, same usage that with upper function.
-// "v3.5.4" will verify if it is higher (newer) than the release's tag/version.
-repositoryReleaseModel.compareVersionWithString(VersionComparingOperators.GREATER, "v3.5.4");
-repositoryReleaseModel.compareVersionWithString(VersionComparingOperators.GREATER, anotherReleaseModel.tagName());
+// We verify that provided version is LOWER than the version of the release that we're using for the comparison.
+return this.releaseAggregateRoot.compareVersionNumber(ComparisonOperator.LESS, 347);
 ```
