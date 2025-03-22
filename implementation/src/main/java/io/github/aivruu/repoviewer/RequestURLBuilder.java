@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
-package io.github.aivruu.repoviewer.repository.application;
+package io.github.aivruu.repoviewer;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +40,7 @@ public final class RequestURLBuilder {
    * @param user the user to search.
    * @param repository the repository of the user.
    * @return A URL formatted for HTTPS requests to GitHub API.
-   * @since 3.3.4
+   * @since 4.0.0
    */
   public static @NotNull String forRepository(final @NotNull String user, final @NotNull String repository) {
     return GITHUB_API_URL.formatted(user, repository);
@@ -54,7 +54,7 @@ public final class RequestURLBuilder {
    * @param repository the repository of the user.
    * @param release the release to get from the repository.
    * @return A URL formatted for http-requests to that repository's release.
-   * @since 3.3.4
+   * @since 4.0.0
    */
   public static @NotNull String forRelease(
     final @NotNull String user, final @NotNull String repository, final @NotNull String release
