@@ -133,13 +133,13 @@ public abstract class AbstractRequest<A extends AggregateRoot> {
    *
    * @param response the response to process.
    * @return A {@link RequestResponseStatus} which can be:
-   * <ls>
-   * <ul>{@link RequestResponseStatus#invalid()} if the response is null, or status-code is unknown.</ul>
-   * <ul>{@link RequestResponseStatus#unauthorized()} for status-code {@code 401}, result is null.</ul>
-   * <ul>{@link RequestResponseStatus#moved()} for status-code {@code 301}, result is null.</ul>
-   * <ul>{@link RequestResponseStatus#forbidden()} for status-code {@code 403}, result is null.</ul>
-   * <ul>{@link RequestResponseStatus#pending()} for status-code {@code 200}, result is still null.</ul>
-   * </ls>
+   * <ul>
+   * <li>{@link RequestResponseStatus#invalid()} if the response is null, or status-code is unknown.</li>
+   * <li>{@link RequestResponseStatus#unauthorized()} for status-code {@code 401}, result is null.</li>
+   * <li>{@link RequestResponseStatus#moved()} for status-code {@code 301}, result is null.</li>
+   * <li>{@link RequestResponseStatus#forbidden()} for status-code {@code 403}, result is null.</li>
+   * <li>{@link RequestResponseStatus#pending()} for status-code {@code 200}, result is still null.</li>
+   * </ul>
    * @since 4.0.0
    */
   public @NotNull RequestResponseStatus<@Nullable A> validateAndProvideResponse(
