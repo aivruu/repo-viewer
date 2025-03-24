@@ -51,7 +51,9 @@ public final class RepositoryRequest extends AbstractRequest<RepositoryAggregate
    * Provides additional-logic for json-deserialization into {@link RepositoryAggregateRoot} object.
    *
    * @return {@inheritDoc}
-   * <ul>{@link RequestResponseStatus#valid(AggregateRoot)} if the json was valid and deserialized.</ul>
+   * <ul>
+   * <li>{@link RequestResponseStatus#valid(AggregateRoot)} if the json was valid and deserialized.</li>
+   * </ul>
    * @since 4.0.0
    */
   @Override

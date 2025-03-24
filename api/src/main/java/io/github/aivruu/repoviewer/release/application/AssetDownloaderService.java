@@ -48,6 +48,11 @@ public final class AssetDownloaderService {
    * @param directory the asset's destination directory.
    * @param index the asset's position.
    * @return A {@link DownloadOperationStatus} which can be:
+   * <ul>
+   * <li>{@link DownloadOperationStatus#error()} if index is not valid, result is {@code -1}.</li>
+   * <li>{@link DownloadOperationStatus#unknown()} if none bytes were read, result is {@code -2}.</li>
+   * <li>{@link DownloadOperationStatus#downloaded(long)} if the file was downloaded, result are the read bytes amount.</li>
+   * </ul>
    * @see DownloaderService#toDirectory(File, String, String)
    * @since 4.0.0
    */
