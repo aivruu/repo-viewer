@@ -14,3 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
+package io.github.aivruu.repoviewer.aggregate.domain;
+
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Represents an aggregate-root model.
+ *
+ * @since 4.0.0
+ */
+public abstract class AggregateRoot {
+  private final String id;
+
+  protected AggregateRoot(final @NotNull String id) {
+    this.id = id;
+  }
+
+  /**
+   * Returns the aggregate-root's id.
+   *
+   * @return The identifier.
+   * @since 4.0.0
+   */
+  public final @NotNull String id() {
+    return this.id;
+  }
+}

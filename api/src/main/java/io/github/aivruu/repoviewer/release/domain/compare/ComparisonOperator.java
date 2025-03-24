@@ -14,3 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
+package io.github.aivruu.repoviewer.release.domain.compare;
+
+/**
+ * Represents the operators that can be used for between-versions comparison.
+ *
+ * @since 4.0.0
+ */
+public enum ComparisonOperator {
+  /** Uses the equality operator. */
+  EQUALITY,
+  /** Uses the inequality operator. */
+  DISTINCTION,
+  /** Uses the less-than operator. */
+  LESS,
+  /** Uses the less-than or equal operator. */
+  LESS_OR_EQUAL,
+  /** Uses the greater operator. */
+  GREATER,
+  /** Uses the greater or equal operator. */
+  GREATER_OR_EQUAL
+}

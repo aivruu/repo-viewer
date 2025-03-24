@@ -1,76 +1,54 @@
 # How to make a request to a Repository, or get a specific-release
-For this, we have the [GithubHttpRequestModel](https://github.com/aivruu/repo-viewer/blob/recode/api/src/main/java/io/github/aivruu/repoviewer/api/http/GithubHttpRequestModel.java)
-interface, which is used as main-model for another implementations responsable of handling the requests made to the specified GitHub repository,
-and the latest-release for that repository. You can create your own implementation for make custom-requests to the API.
 
-This interface provides four methods (two default): `requestUsing(HttpClient, int)`, `request(int)`, `requestUsingThen(HttpClient, int, Consumer<Model>)`, `requestThen(int, Consumer<Model>)`. The methods that ends with ___Then___ will require a Consumer which their defined-type will correspond to the model
-for the request, which can be a `GithubRepositoryModel` or `LatestReleaseModel`, that logic
-will be executed only if a response was provided and the json-body was deserialized into respective model, otherwise, if due to some reason a `null-value` was returned, the consumer will be ignored. The functions that have ___Using___ will require a configured http-client that will be used to perform the requests to the specified repository/release. All these functions also will require an `int-type` parameter which is the max-timeout for every made http-request.
-
-These functions will return a `CompletableFuture<ResponseStatusProvider<Model>>`, where the model returned by the status-provider could be null, the
-[ResponseStatusProvider](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/api/http/status/ResponseStatusProvider.java) have 5 possible status to provide (2 for repositories, one for requests), also, giving methods for new status-provider instances creation, or status-code type verification.
-
-This interface have two implementations, [ReleaseHttpRequestModel](https://github.com/aivruu/repo-viewer/blob/recode/implementation/src/main/java/io.github.aivruu.repoviewer/ReleaseHttpRequestModel.java)
-used for repository's latest-release request, this implementation will return a `CompletableFuture<ResponseStatusProvider<LatestReleaseModel>>`. [RepositoryHttpRequestModel](https://github.com/aivruu/repo-viewer/blob/recode/implementation/src/main/java/io.github.aivruu.repoviewer/RepositoryHttpRequestModel.java)
-is used for repository requests, and will return a `CompletableFuture<ResponseStatusProvider<GithubRepositoryModel>>` for the made request.
-
-To use this implementations only we need to give them the url for the repository which we are searching for, for get an usable-url for the request,
-we use the [RepositoryUrlBuilder](https://github.com/aivruu/repo-viewer/blob/recode/implementation/src/main/java/io.github.aivruu.repoviewer/RepositoryUrlBuilder.java)
-class, which provides the method `from(String, String)` that require the repository's creator github user, and the repository's name.
-
-This examples also applies for the [RepositoryHttpRequestModel](https://github.com/aivruu/repo-viewer/blob/recode/implementation/src/main/java/io.github.aivruu.repoviewer/RepositoryHttpRequestModel.java) implementation.
+To make a request initially, we need to create one, for this, we use the Request class which is a factory for the
+requests creation, for the url-building we can use the RequestURLBuilder for it, a basic-example of how to create a request
+for a repository's latest-release:
 
 ```java
-final var releaseHttpRequestModel = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
-releaseHttpRequest.request(/** Timeout will be 5 seconds. */ 5).thenAccept(responseStatusProvider -> {
-  // The deserialized-model could be null, so we need to check first.
-  if (!responseStatusProvider.valid()) return;
-
-  final var latestReleaseModel = responseStatusProvider.result();
-  System.out.println("Viewing latest-release with version: " + latestReleaseModel.version());
-});
+final var releaseRequest = Request.create()
+  // Or use forRepository for a specific-repository request.
+  .url(RequestURLBuilder.forRelease("aivruu", "repo-viewer", "latest"))
+  // We can provide a custom-client, or not define a custom-one for  use the default-one the library provides.
+  .client(HttpClient.newBuilder()
+    .executor(Executors.newSingleThreadExecutor())
+    .build()
+  )
+  // We specify the timeout, this value is always represented in-seconds.
+  .timeout(10)
+  // In case you want to request a repository, you should use the repository() method to get a RepositoryRequest object.
+  .release();
 ```
-An example using a pre-configured http-client for make the request:
-```java
-final var customHttpClient = HttpClient.newBuilder()
-  .version(HttpClient.Version.HTTP_1_1) // We define http-protocol 1.1 to use.
-  .build();
-final var releaseHttpRequestModel = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
-releaseHttpRequest.requestUsing(customHttpClient, 5) // Timeout will be 5 seconds.
-  .thenAccept(responseStatusProvider -> {
-    // The deserialized-model could be null, so we need to check first.
-    if (!responseStatusProvider.unauthorized()) {
-      System.out.println("Request's response from the API is: 401 - Unauthorized.");
-      return;
-    }
 
-    final var latestReleaseModel = responseStatusProvider.result();
-    System.out.println("Viewing latest-release with version: " + latestReleaseModel.version());
-  })
-  .thenRun(customHttpClient::close); // This http-client will be closed once the completable-future has been completed.
-```
-Examples using a Consumer to define the logic to execute in case that a response was provided and a model was deserialized
-with the `json-body` from that response.
+There's two implementations to handle repository and release http-requests, ReleaseRequest & RepositoryRequest, both
+inherits from super-class AbstractRequest, you can make your own implementations from this if you want to.
+
+Once the object is created, there's a few methods you can use to make the request, receive and handle the information.
+* `requestAndHandle()` - It'll make the request, handle the result for null-values or exceptions-throwing, and using the 
+  `validateAndProvideResponse(HttpRequest<String>)` will provide a specific `RequestResponseStatus` for the operation.
+  This method will return a `CompletableFuture` that will provide a non-null `RequestResponseStatus`object.
+* `request()` - This method will make the request and return a `CompletableFuture` with a non-null `HttpResponse<String>`
+  object, but it'll not provide any handling for the request itself.
+* `close()` - It'll close the `HttpClient` used to perform the request.
+
+The previously-mentioned implementations override the `validateAndProvideResponse(HttpRequest<String>)` method, to proportionate
+a specific `RequestResponseStatus` object for that operation, this object could contain a null-value, or a AggregateRoot
+inheritor, such as RequestAggregateRoot or RepositoryAggregateRoot, which will provide access to the information provided
+by the request after it be processed.
+
+After the request was made and processed, you can manipulate the object provided, but, before we need to verify that a valid-response
+was provided using `RequestResponseStatus#wasValid`, otherwise, it will mean that the response's result is `null`.
+
 ```java
-final var releaseHttpRequestModel = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
-releaseHttpRequest.requestThen(/** Timeout will be 5 seconds. */ 5, latestReleaseModel ->
-  System.out.println("Viewing latest-release with version: " + latestReleaseModel.version())).thenAccept(responseStatusProvider -> {
-    if (responseStatusProvider.moved()) System.out.println("Probably requested repository was moved.");
-  });
-```
-Example with a configured http-client:
-```java
-final var customHttpClient = HttpClient.newBuilder()
-  .version(HttpClient.Version.HTTP_1_1) // We define http-protocol 1.1 to use.
-  .build();
-final var releaseHttpRequestModel = new ReleaseHttpRequestModel(RepositoryUrlBuilder.from("aivruu", "repo-viewer"));
-releaseHttpRequest.requestUsingThen(customHttpClient, /** Timeout will be 5 seconds. */ 5, latestReleaseModel -> cache.put("release-http-request", latestReleaseModel))
-  .thenAccept(responseStatusProvider -> {
-    if (!responseStatusProvider.forbidden()) {
-      System.out.println("Request's response from the API is: 403 - Forbidden.");
-      return;
-    }
-    System.out.println("Repository's latest-release with version: " + latestReleaseModel.version());
-  })
-  .thenRun(customHttpClient::close); // This http-client will be closed once the completable-future has been completed.
+// ...
+final var requestResponseStatus = releaseRequest.requestAndHandle().join;
+if (!requestResponseStatus.isValid()) {
+  this.logger.error("The request was made, but the response is not valid, status-code: {}", responseStatus.status());
+  return;
+}
+// Assuming we're requesting a release, otherwise, we should receive a RepositoryAggregateRoot.
+final var releaseAggregateRoot = responseStatus.result();
+// Now we can manipulate the result to access to its information.
+this.logger.info("Request successfull, received information for release with id: {}", releaseAggregateRoot.id());
+// We close the http-client used for the request.
+releaseRequest.close();
 ```

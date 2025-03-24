@@ -4,10 +4,11 @@
 ![GitHub License](https://img.shields.io/github/license/aivruu/repo-viewer)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/aivruu/repo-viewer)
 
-`repo-viewer` permits to get information about GitHub repositories, and any release published for these repositories, besides of allowing download these releases' adjunted assets, providing several functionalities with a decent code-quality and an understandable and very docummented structure.
+`repo-viewer` is a library that provides utilities to request information from GitHub repositories and those repositories' releases, as well
+download any asset that is included in the release.
 
 > [!NOTE]\
-> I started this project with the only propuse of testing HTTP utilities with Java. I taken as base [OcZi/release-watcher](https://github.com/OcZi/release-watcher) for the main idea of this project.
+> I started this project with the only purpose of testing HTTP utilities with Java. I took as base [OcZi/release-watcher](https://github.com/OcZi/release-watcher) for the main idea of this project.
 
 ## Features
 * View specified repository's information.

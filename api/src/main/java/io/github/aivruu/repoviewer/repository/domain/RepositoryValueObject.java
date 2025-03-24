@@ -14,3 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
+package io.github.aivruu.repoviewer.repository.domain;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * Represents a published-repository in GitHub.
+ *
+ * @param owner the repository's owner.
+ * @param name the repository's name.
+ * @param description the repository's description.
+ * @param license the repository's license, {@code null} if it don't have one.
+ * @param properties the repository's properties.
+ * @since 4.0.0
+ */
+public record RepositoryValueObject(
+  @NotNull String owner, @NotNull String name, @NotNull String description,
+  @Nullable String license, @NotNull RepositoryPropertiesValueObject properties
+) {}

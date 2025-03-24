@@ -11,7 +11,7 @@ subprojects {
   apply(plugin = "maven-publish")
   apply(plugin = "net.kyori.indra")
   apply(plugin = "com.diffplug.spotless")
-  apply(plugin = "io.github.goooler.shadow")
+  apply(plugin = "com.gradleup.shadow")
 
   indra {
     javaVersions {
@@ -29,17 +29,14 @@ subprojects {
       licenseHeaderFile("$rootDir/header/header.txt")
       removeUnusedImports()
       trimTrailingWhitespace()
-      indentWithSpaces(2)
     }
     kotlinGradle {
       trimTrailingWhitespace()
-      indentWithSpaces(2)
     }
   }
 
   dependencies {
-    implementation("org.jetbrains:annotations:24.0.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    implementation("org.jetbrains:annotations:26.0.2")
   }
 
   tasks {
@@ -55,7 +52,7 @@ subprojects {
       val relocationFinalPackage = "io.github.aivruu.repoviewer.libs"
 
       relocate("org.jetbrains.annotations", "$relocationFinalPackage.org.jetbrains.annotations")
-      relocate("com.google", "$relocationFinalPackage.com.google")
+      relocate("com.google.gson", "$relocationFinalPackage.com.google.gson")
     }
   }
 
