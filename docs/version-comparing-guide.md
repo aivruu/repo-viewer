@@ -1,7 +1,7 @@
 # How to compare a release's tag-name/version with another
 
-For this, the [ReleaseValueObject](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/release/domain/ReleaseValueObject.java) provides a few methods (which are accessible from its aggregate-root) to compare the
-current release's tag-name with another, using an specific operator-type for the comparison, check [ComparisonOperator](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/release/domain/compare/ComparisonOperator.java).
+For this, the [`ReleaseValueObject`](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/release/domain/ReleaseValueObject.java) provides a few methods (which are accessible from its aggregate-root) to compare the
+current release's tag-name with another, using an specific operator-type for the comparison, check [`ComparisonOperator`](https://github.com/aivruu/repo-viewer/blob/main/api/src/main/java/io/github/aivruu/repoviewer/release/domain/compare/ComparisonOperator.java).
 
 The `compareVersionNumber(ComparisonOperator, int)` will compare the release's tag with the given version-number using
 the defined operator-type for the comparison, and will return a `boolean` result for comparing-function's completion.
